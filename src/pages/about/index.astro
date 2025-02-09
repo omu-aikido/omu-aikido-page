@@ -1,0 +1,85 @@
+---
+import { default as Layout } from "@/src/layouts/non-auth-layout.astro";
+---
+
+<Layout title="About" transition:animate={"fade"}>
+    <h1 class="block-color-orange_background">about us</h1>
+    <p>
+        2022年の春より、大阪市立大学合氣道サークルと大阪府立大学合氣道部が統合し、大阪公立大学合氣道部として活動しています！
+    </p>
+    <p>
+        唯一中百舌鳥キャンパス、杉本キャンパスの両方で活動する公認の体育会所属の合気道部です。
+    </p>
+    <p>
+        詳しくは<a href="/about/what-is">こちら</a>をご覧ください。
+    </p>
+    <p>
+        また，<a href="/about/links">リンク集</a
+        >には、私たちと交流のある他の大学の部活動さんのリンクをまとめています。ぜひご覧ください。
+    </p>
+
+    <hr />
+    <h1 class="block-color-blue_background">活動場所</h1>
+    <p>大阪公立大学の以下施設にて活動しています。</p>
+    <ul class="bulleted-list">
+        <li style="list-style-type:disc">
+            中百舌鳥キャンパス体育館1階・武道場
+        </li>
+    </ul>
+    <ul class="bulleted-list">
+        <li style="list-style-type:disc">杉本キャンパス新武道場</li>
+    </ul>
+    <p class="block-color-default">
+        詳細については<a href="/access">稽古場</a> ご覧ください
+    </p>
+    <h1 class="block-color-teal_background">活動日</h1>
+    <table class="simple-table">
+        <thead class="simple-table-header">
+            <tr>
+                <th
+                    class="simple-table-header-color simple-table-header"
+                    style="width:48px">曜日</th
+                >
+                <th
+                    class="simple-table-header-color simple-table-header"
+                    style="width:105px">時間</th
+                >
+                <th
+                    class="simple-table-header-color simple-table-header"
+                    style="width:208.3046875px">場所</th
+                >
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="width:48px">月</td>
+                <td style="width:105px">17:30~19:30</td>
+                <td style="width:208.3046875px">中百舌鳥キャンパス</td>
+            </tr>
+            <tr>
+                <td style="width:48px">火</td>
+                <td style="width:105px">18:30~19:30</td>
+                <td style="width:208.3046875px">中百舌鳥キャンパス</td>
+            </tr>
+            <tr>
+                <td style="width:48px">金</td>
+                <td style="width:105px">19:30~21:00</td>
+                <td style="width:208.3046875px">杉本キャンパス</td>
+            </tr>
+            <tr>
+                <td style="width:48px">土</td>
+                <td style="width:105px">18:00~20:00</td>
+                <td style="width:208.3046875px">中百舌鳥キャンパス</td>
+            </tr>
+        </tbody>
+    </table>
+    <p>
+        詳しい予定は<a href="/schedule">予定表</a>をご確認ください。
+    </p>
+    <hr />
+    <h1 class="block-color-purple_background">ご連絡</h1>
+    <p>稽古の見学や体験に興味のある方は以下からご連絡ください。</p>
+    <p>
+        <a href="/contact">ご連絡</a>
+    </p>
+</Layout>

@@ -1,0 +1,26 @@
+{
+  "name": "page",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro build && wrangler pages dev",
+    "astro": "astro",
+    "deploy": "astro build && wrangler pages deploy",
+    "cf-typegen": "wrangler types",
+    "preinstall": "sh preinstall.sh"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^12.2.1",
+    "astro": "^5.2.5",
+    "ts-ics": "^1.6.6"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250204.0",
+    "wrangler": "^3.107.3"
+  },
+  "volta": {
+    "node": "22.13.0"
+  }
+}
