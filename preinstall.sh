@@ -6,6 +6,7 @@ cd ./
 # 既存componentsディレクトリ削除
 rm -rf src/components
 rm -rf src/layouts
+rm -rf src/styles
 
 # GitHubからcomponentsディレクトリとlayoutsディレクトリを取得
 curl -L "https://github.com/omu-aikido/omu-aikido-app/archive/refs/heads/master.tar.gz" \
