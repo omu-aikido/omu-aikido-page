@@ -9,10 +9,11 @@
     "astro": "astro",
     "deploy": "astro build && wrangler pages deploy",
     "cf-typegen": "wrangler types",
-    "preinstall": "sh preinstall.sh"
+    "prebuild": "sh prebuild.sh"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.2.1",
+    "@astrojs/sitemap": "^3.2.1",
     "astro": "^5.2.5",
     "ts-ics": "^1.6.6"
   },
