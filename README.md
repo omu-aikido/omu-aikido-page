@@ -2,7 +2,7 @@
 
 ## 概要
 
-Astro.jsを使用して開発されています。AstroJs
+Astro.jsを使用して開発されています。
 ## 開発環境
 
 ### 依存 （2025-02-09時点）
@@ -20,8 +20,9 @@ Astro.jsを使用して開発されています。AstroJs
 
 ### ローカルでの開発方法
 
-`npx preinstall`で[omu-aikido-app](https://github.com/omu-aikido/omu-aikido-app)から必要なLayoutsやコンポーネントを取得します。
-
+`npm run prebuild`で[omu-aikido-app](https://github.com/omu-aikido/omu-aikido-app)から必要なLayoutsやコンポーネントを取得します。
+必ず必要なコンポーネントをダウンロードしてから編集するようにしてください。
+また、これらの依存コンポーネントは編集が追跡されません。
 
 ```bash
 $ npx astro dev # ローカルサーバを起動します
