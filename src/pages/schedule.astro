@@ -97,9 +97,7 @@ import ProgressCircle from "@/src/components/ui/progress-circle.astro";
     // ICSデータを取得する関数
     async function fetchIcsData(): Promise<Event[]> {
         try {
-            const response = await fetch(
-                "https://app.omu-aikido.com/api/utils/calendar"
-            );
+            const response = await fetch("https://api.omu-aikido.com/calendar");
             if (!response.ok) {
                 throw new Error(
                     `Failed to fetch ICS data: ${response.statusText}`
