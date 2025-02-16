@@ -1,6 +1,7 @@
 ---
 import { default as Layout } from "@/src/layouts/non-auth-layout.astro";
 import TextOverImage from "@/src/components/ui/text-over-image.astro";
+import NewsReader from "@/src/components/ui/news-reader.astro";
 ---
 
 <Layout title="ホーム">
@@ -19,6 +20,8 @@ import TextOverImage from "@/src/components/ui/text-over-image.astro";
                 </h4>
             </TextOverImage>
         </div>
+
+        <NewsReader content="short" path="news" source="news" />
 
         <section class="what-is-aikido-section">
             <a href="/about/what-is">
