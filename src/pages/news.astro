@@ -1,5 +1,8 @@
 ---
+import { default as Layout } from "@/src/layouts/non-auth-layout.astro";
 import NewsReader from "@/src/components/ui/news-reader.astro";
 ---
 
-<NewsReader content="long" path="news" source="news" />
+<Layout title="ニュース">
+    <NewsReader content="long" path="news" source="news" />
+</Layout>
