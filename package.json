@@ -9,7 +9,7 @@
     "astro": "astro",
     "deploy": "astro build && wrangler pages deploy",
     "cf-typegen": "wrangler types",
-    "prebuild": "sh prebuild.sh"
+    "import": "sh prebuild.sh"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.2.1",
