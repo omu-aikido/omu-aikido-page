@@ -4,6 +4,61 @@ import Icon from "@/src/components/root/Icon.astro";
 ---
 
 <Layout title="お問い合わせ">
+    <div class="contact-form">
+        <h1>お問い合わせフォーム</h1>
+        <p>
+            お問い合わせ内容をご記入の上、送信ボタンを押してください。折り返しメールにてご連絡いたします。
+        </p>
+        <form
+            action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSchtw1jUUb-myThkbJWbDBnRqXXuKHVhFwQ8RMNS9iZ8vUt7Q/formResponse"
+            target="_blank"
+        >
+            <label for="name">
+                お名前
+                <span class="required-mark">*</span>
+            </label>
+            <input
+                id="name"
+                type="text"
+                name="entry.1687999543"
+                placeholder="山田太郎"
+                required
+            />
+
+            <label for="email">
+                メールアドレス
+                <span class="required-mark">*</span>
+            </label>
+            <input
+                id="email"
+                type="email"
+                name="entry.943302473"
+                placeholder="example@mail.co.jp"
+                required
+            />
+
+            <label for="msg">
+                お問い合わせ内容
+                <span class="required-mark">*</span>
+            </label>
+            <textarea
+                id="msg"
+                name="entry.1694948814"
+                placeholder="お気軽にお問い合わせください。"
+                required></textarea>
+
+            <button type="submit">送信</button>
+            <small>
+                *このフォームはGoogle
+                Formを利用しています。送信ボタンを押した後、新しいタブでGoogleフォームが開きます。
+                <br />
+                送信が失敗した場合は、申し訳ございませんが、開いたGoogleフォームから再度送信してください。
+            </small>
+        </form>
+    </div>
+
+    <hr />
+
     <div class="contact-container">
         <section class="sns-section">
             <h2>SNS</h2>
@@ -52,6 +107,11 @@ import Icon from "@/src/components/root/Icon.astro";
         margin: 0 auto;
     }
 
+    .required-mark {
+        color: rgb(var(--red));
+        font-size: 0.8rem;
+    }
+
     section {
         margin-bottom: 4rem;
     }
@@ -95,10 +155,36 @@ import Icon from "@/src/components/root/Icon.astro";
         box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
     }
 
-    p {
+    .contact-container p {
         font-size: 1rem;
         opacity: 0.9;
         color: rgb(var(--subtext0));
         transition: color 0.3s ease;
     }
+
+    form {
+        display: grid;
+        gap: 1rem;
+        margin: 0 10%;
+    }
+
+    textarea {
+        height: 10rem;
+        background-color: rgb(var(--surface0));
+        border: 2px solid rgb(var(--border));
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        resize: none;
+        transition: all 0.3s ease;
+        color: rgb(var(--text));
+    }
 </style>
+
+{/* フォームのボタンがクリックされたとき、サブミット後に内容をクリアする */}
+<script>
+    document.querySelector("form")?.addEventListener("submit", () => {
+        setTimeout(() => {
+            document.querySelector("form")?.reset();
+        }, 1000);
+    });
+</script>
