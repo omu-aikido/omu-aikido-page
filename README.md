@@ -1,4 +1,6 @@
 # ホームページ
+[![Preview on Cloudflare Pages](https://github.com/omu-aikido/omu-aikido-page/actions/workflows/preview.yml/badge.svg)](https://github.com/omu-aikido/omu-aikido-page/actions/workflows/preview.yml)
+[![Deploy to Cloudflare Pages](https://github.com/omu-aikido/omu-aikido-page/actions/workflows/deploy.yml/badge.svg)](https://github.com/omu-aikido/omu-aikido-page/actions/workflows/deploy.yml)
 
 ## 概要
 
