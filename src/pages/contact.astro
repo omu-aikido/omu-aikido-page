@@ -1,6 +1,159 @@
 ---
 import { default as Layout } from "@/src/layouts/static-layout.astro";
-import Icon from "@/src/components/root/Icon.astro";
+
+export const prerender = false;
+
+const TURNSTILE_SITE_KEY = import.meta.env.TURNSTILE_SITE_KEY;
+const TURNSTILE_SECRET_KEY = import.meta.env.TURNSTILE_SECRET_KEY;
+
+let errors = {
+    name: "",
+    email: "",
+    msg: "",
+    turnstile: "",
+};
+let submitted = false;
+let submitSuccess = false;
+let errorMessage = "";
+
+if (Astro.request.method === "POST") {
+    try {
+        const data = await Astro.request.formData();
+        const name = data.get("name");
+        if (typeof name !== "string" || name.trim() === "") {
+            errors.name = "名前は必須です。";
+        }
+        const email = data.get("email");
+        if (typeof email !== "string" || email.trim() === "") {
+            errors.email = "メールアドレスは必須です。";
+        } else if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+            errors.email = "有効なメールアドレスを入力してください。";
+        }
+        const msg = data.get("msg");
+        if (
+            typeof msg !== "string" ||
+            msg.trim() === "" ||
+            !msg.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/)
+        ) {
+            errors.msg =
+                "お問い合わせ内容は必須です。日本語で入力してください。";
+        }
+
+        // Turnstileトークンの検証
+        const token = data.get("cf-turnstile-response");
+        if (!token) {
+            errors.turnstile = "ロボットでないことを確認してください。";
+        } else {
+            // Turnstileトークンをサーバーサイドで検証
+            const formData = new FormData();
+            formData.append("secret", TURNSTILE_SECRET_KEY);
+            formData.append("response", token.toString());
+            formData.append(
+                "remoteip",
+                Astro.request.headers.get("CF-Connecting-IP") || ""
+            );
+
+            const turnstileResult = await fetch(
+                "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+                {
+                    method: "POST",
+                    body: formData,
+                }
+            );
+
+            const outcome = (await turnstileResult.json()) as {
+                success: boolean;
+                "error-codes": string[];
+                challenge_ts: string;
+                hostname: string;
+            };
+
+            if (!outcome.success) {
+                errors.turnstile =
+                    "認証に失敗しました。もう一度お試しください。";
+            }
+        }
+
+        const hasErrors = Object.values(errors).some((msg) => msg);
+        if (!hasErrors) {
+            // ここで実際にメール送信処理を実行
+            const response = await sendMail(
+                name as string,
+                email as string,
+                msg as string
+            );
+            submitted = true;
+            if (response.status === 200) {
+                submitSuccess = true;
+            } else {
+                errorMessage = await response.text();
+            }
+        }
+    } catch (e) {
+        submitted = true;
+        submitSuccess = false;
+        if (e instanceof Error) {
+            console.error(e.message);
+            errorMessage =
+                "送信処理中にエラーが発生しました。後ほど再度お試しください。";
+        }
+    }
+}
+
+async function sendMail(name: string, email: string, msg: string) {
+    const sender = "大阪公立大学合氣道部";
+    const senderEmail = "noreply@omu-aikido.com";
+    const recipientEmail = "aikido.omu@gmail.com";
+    const toAdminRes = await fetch("https://api.mailchannels.net/tx/v1/send", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            personalizations: [
+                {
+                    to: [{ email: recipientEmail }],
+                },
+            ],
+            from: { email: senderEmail, name: sender },
+            subject: "お問い合わせがありました",
+            content: [
+                {
+                    type: "text/plain",
+                    value: `【お名前】\n${name}様\n【メールアドレス】\n${email}\n【お問い合わせ内容】\n${msg}`,
+                },
+            ],
+        }),
+    });
+
+    if (toAdminRes.ok) {
+        await fetch("https://api.mailchannels.net/tx/v1/send", {
+            method: "POST",
+            headers: {
+                "content-type": "application/json",
+            },
+            body: JSON.stringify({
+                personalizations: [
+                    {
+                        to: [{ email }],
+                    },
+                ],
+                from: { email: senderEmail, name: sender },
+                subject: "お問い合わせありがとうございます",
+                content: [
+                    {
+                        type: "text/plain",
+                        value: `${name}様\n大阪公立大学合氣道部です。\nこの度はお問い合わせいただきありがとうございます。以下の内容でお問い合わせを受け付けました。\n【お問い合わせ内容】\n${msg}`,
+                    },
+                ],
+            }),
+        });
+
+        return new Response("送信に成功しました！", { status: 200 });
+    }
+
+    return new Response("送信に失敗しました。", { status: 500 });
+}
 ---
 
 <Layout title="お問い合わせ">
@@ -9,99 +162,134 @@ import Icon from "@/src/components/root/Icon.astro";
         <p>
             お問い合わせ内容をご記入の上、送信ボタンを押してください。折り返しメールにてご連絡いたします。
         </p>
-        <form
-            action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSchtw1jUUb-myThkbJWbDBnRqXXuKHVhFwQ8RMNS9iZ8vUt7Q/formResponse"
-            target="_blank"
-        >
-            <label for="name">
-                お名前
-                <span class="required-mark">*</span>
-            </label>
-            <input
-                id="name"
-                type="text"
-                name="entry.1687999543"
-                placeholder="山田太郎"
-                required
-            />
 
-            <label for="email">
-                メールアドレス
-                <span class="required-mark">*</span>
-            </label>
-            <input
-                id="email"
-                type="email"
-                name="entry.943302473"
-                placeholder="example@mail.co.jp"
-                required
-            />
+        {
+            submitted && submitSuccess ? (
+                <div class="success-message">
+                    <h3>送信完了</h3>
+                    <p>
+                        お問い合わせいただきありがとうございます。確認メールをお送りしましたのでご確認ください。
+                    </p>
+                    <p>内容を確認次第、担当者からご連絡いたします。</p>
+                </div>
+            ) : submitted && !submitSuccess ? (
+                <div class="error-message">
+                    <h3>送信エラー</h3>
+                    <p>
+                        {errorMessage ||
+                            "送信に失敗しました。時間をおいて再度お試しください。"}
+                    </p>
+                    <button onclick="window.location.reload()">
+                        再試行する
+                    </button>
+                </div>
+            ) : (
+                <form method="POST">
+                    <label for="name">
+                        お名前
+                        <span class="required-mark">*</span>
+                    </label>
+                    <input
+                        id="name"
+                        type="text"
+                        name="name"
+                        placeholder="山田太郎"
+                        required
+                    />
+                    {errors.name && <p class="error">{errors.name}</p>}
 
-            <label for="msg">
-                お問い合わせ内容
-                <span class="required-mark">*</span>
-            </label>
-            <textarea
-                id="msg"
-                name="entry.1694948814"
-                placeholder="お気軽にお問い合わせください。"
-                required></textarea>
+                    <label for="email">
+                        メールアドレス
+                        <span class="required-mark">*</span>
+                    </label>
+                    <input
+                        id="email"
+                        type="email"
+                        name="email"
+                        placeholder="example@mail.co.jp"
+                        required
+                    />
+                    {errors.email && <p class="error">{errors.email}</p>}
 
-            <button type="submit">送信</button>
-            <small>
-                *このフォームはGoogle
-                Formを利用しています。送信ボタンを押した後、新しいタブでGoogleフォームが開きます。
-                <br />
-                送信が失敗した場合は、申し訳ございませんが、開いたGoogleフォームから再度送信してください。
-            </small>
-        </form>
+                    <label for="msg">
+                        お問い合わせ内容
+                        <span class="required-mark">*</span>
+                    </label>
+                    <textarea
+                        id="msg"
+                        name="msg"
+                        placeholder="お気軽にお問い合わせください。"
+                        required
+                    />
+                    {errors.msg && <p class="error">{errors.msg}</p>}
+
+                    {/* Turnstileウィジェット */}
+                    <div id="turnstile-widget" class="turnstile-container" />
+                    {errors.turnstile && (
+                        <p class="error">{errors.turnstile}</p>
+                    )}
+
+                    <button id="submit-button" type="submit" disabled>
+                        送信
+                    </button>
+                </form>
+            )
+        }
     </div>
 
     <hr />
 
-    <div class="contact-container">
-        <section class="sns-section">
-            <h2>SNS</h2>
-            <div class="sns-grid">
-                <a href="https://twitter.com/fudaiaiki" class="sns-card">
-                    <div>
-                        <h4>ツイッター<br />旧府大体育会合氣道部</h4>
-                        <p>@fudaiaiki</p>
-                    </div>
-                </a>
-                <a href="https://twitter.com/new_ocuaikido" class="sns-card">
-                    <div>
-                        <h4>ツイッター<br />旧市大合気道サークル</h4>
-                        <p>@new_ocuaikido</p>
-                    </div>
-                </a>
-                <a
-                    href="https://www.instagram.com/hamudaiaikidoubu/"
-                    class="sns-card"
-                >
-                    <div>
-                        <h4>Instagram</h4>
-                        <p>@hamudaiaikidoubu</p>
-                    </div>
-                </a>
-            </div>
-        </section>
-
-        <section class="mail-section">
-            <h2>Mail</h2>
-            <div class="sns-grid">
-                <a href="mailto:new.ocuaikido@gmail.com" class="mail-card">
-                    <div>
-                        <h4>Gmail</h4>
-                        <p>new.ocuaikido@gmail.com</p>
-                    </div>
-                </a>
-            </div>
-        </section>
-    </div>
+    <p>弊部へのご連絡はSNS/メールアドレスからも可能です。</p>
+    <a href="/social">SNS/メールアドレス一覧</a>
 </Layout>
 
+<script define:vars={{ siteKey: TURNSTILE_SITE_KEY }}>
+    window.onloadTurnstileCallback = function () {
+        turnstile.render("#turnstile-widget", {
+            sitekey: siteKey,
+            callback: function () {
+                document
+                    .getElementById("submit-button")
+                    .removeAttribute("disabled");
+            },
+        });
+    };
+</script>
+
+<script
+    src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback"
+    async
+    defer></script>
+
 <style>
+    .error {
+        color: rgb(var(--red));
+    }
+    .success-message {
+        background-color: rgba(var(--green), 0.1);
+        border: 1px solid rgb(var(--green));
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .error-message {
+        background-color: rgba(var(--red), 0.1);
+        border: 1px solid rgb(var(--red));
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    button {
+        cursor: pointer;
+    }
+    .turnstile-container {
+        margin: 1rem 0;
+    }
+    button[disabled] {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
     .contact-container {
         max-width: 64rem;
         margin: 0 auto;
@@ -124,35 +312,6 @@ import Icon from "@/src/components/root/Icon.astro";
         padding-bottom: 0.75rem;
         color: rgb(var(--text));
         letter-spacing: 0.05em;
-    }
-
-    .sns-grid {
-        display: grid;
-        gap: 2rem;
-    }
-
-    @media (min-width: 800px) {
-        .sns-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    .sns-card,
-    .mail-card {
-        padding: 0.5rem 1rem;
-        background: rgb(var(--surface0));
-        border-radius: 1rem;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 2px solid transparent;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .sns-card:hover,
-    .mail-card:hover {
-        transform: translateY(-4px) scale(1.02);
-        background: rgb(var(--surface1));
-        border-color: rgb(var(--blue));
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
     }
 
     .contact-container p {
@@ -179,12 +338,3 @@ import Icon from "@/src/components/root/Icon.astro";
         color: rgb(var(--text));
     }
 </style>
-
-{/* フォームのボタンがクリックされたとき、サブミット後に内容をクリアする */}
-<script>
-    document.querySelector("form")?.addEventListener("submit", () => {
-        setTimeout(() => {
-            document.querySelector("form")?.reset();
-        }, 1000);
-    });
-</script>
