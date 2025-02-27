@@ -39,8 +39,6 @@ if (Astro.request.method === "POST") {
                 "お問い合わせ内容は必須です。日本語で入力してください。";
         }
 
-        console.log(data.get("cf-turnstile-response"));
-
         // Turnstileトークンの検証
         const token = data.get("cf-turnstile-response");
         if (!token) {
