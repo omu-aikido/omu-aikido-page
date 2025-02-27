@@ -226,7 +226,7 @@ async function sendMail(name: string, email: string, msg: string) {
                     {errors.msg && <p class="error">{errors.msg}</p>}
 
                     {/* Turnstileウィジェット */}
-                    <div class="turnstile-container" />
+                    <div id="turnstile-widget" class="turnstile-container" />
                     {errors.turnstile && (
                         <p class="error">{errors.turnstile}</p>
                     )}
@@ -245,19 +245,23 @@ async function sendMail(name: string, email: string, msg: string) {
     <a href="/social">SNS/メールアドレス一覧</a>
 </Layout>
 
-<script
-    src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback"
-    defer></script>
-<script lang="js" define:vars={{ siteKey: TURNSTILE_SITE_KEY }}>
+<script define:vars={{ siteKey: TURNSTILE_SITE_KEY }}>
     window.onloadTurnstileCallback = function () {
-        turnstile.render("#turnstile-container", {
+        turnstile.render("#turnstile-widget", {
             sitekey: siteKey,
-            callback: function (token) {
-                console.log(`Challenge Success ${token}`);
+            callback: function () {
+                document
+                    .getElementById("submit-button")
+                    .removeAttribute("disabled");
             },
         });
     };
 </script>
+
+<script
+    src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback"
+    async
+    defer></script>
 
 <style>
     .error {
