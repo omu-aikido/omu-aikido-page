@@ -1,253 +1,33 @@
 ---
 import { default as Layout } from "@/src/layouts/static-layout.astro";
+import ScheduleCalendar from "@/src/components/ui/calendar.astro";
 import ProgressCircle from "@/src/components/ui/progress-circle.astro";
 ---
 
 <Layout title="稽古予定">
-    <div class="progress-circle">
-        <ProgressCircle title="予定を取得しています" />
-    </div>
     <h1 class="block-color-orange_background">稽古予定</h1>
-    <div class="timeTable"></div>
+    <div class="timeTable">
+        <ScheduleCalendar server:defer>
+            <div class="fallback" slot="fallback">
+                <ProgressCircle title="Loading" inline="true" />
+            </div>
+        </ScheduleCalendar>
+    </div>
+    <hr />
+    <a
+        href="https://calendar.google.com/calendar/ical/new.ocuaikido%40gmail.com/public/basic.ics"
+    >
+        Googleカレンダー
+    </a>では過去の稽古や１ヶ月以上先の稽古予定も確認できます。
 </Layout>
 
-<style is:global>
+<style>
     .timeTable {
         max-width: 620px;
         margin: 2rem auto;
-        padding: 1rem;
     }
 
-    .event {
-        min-width: 620px;
-        background: rgb(var(--surface0));
-        border-radius: 16px;
-        padding: 1.8rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 15px rgb(var(--shadow) / 0.2);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 2px solid transparent;
-        display: flex;
-        align-items: center;
-        flex-direction: row;
-        justify-content: space-between;
-    }
-
-    .event-title {
-        font-size: 1.3rem;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-        margin: 0.7rem 0;
-    }
-
-    .event-title.sapphire {
-        color: rgb(var(--sapphire));
-    }
-
-    .event-title.green {
-        color: rgb(var(--green));
-    }
-
-    .event-title {
-        color: rgb(var(--maroon));
-    }
-
-    .event-time {
-        color: rgb(var(--text));
-        line-height: 1.5;
-        margin: 0.7rem 0;
-    }
-
-    .no-events {
-        text-align: center;
-        color: rgb(var(--subtext0));
-        padding: 2rem;
-    }
-
-    @media (max-width: 815px) {
-        .event {
-            min-width: 266px;
-            background: rgb(var(--surface0));
-            border-radius: 16px;
-            padding: 1.2rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 15px rgb(var(--shadow) / 0.2);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 2px solid transparent;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .timeTable {
-            padding: 0;
-        }
+    .fallback {
+        height: 70vh;
     }
 </style>
-
-<script>
-    let ics_str: string | null = null;
-    interface Event {
-        summary: string;
-        start: Date;
-        end: Date | null;
-    }
-
-    import { icsCalendarToObject, type VEvent } from "ts-ics";
-
-    // ICSデータを取得する関数
-    async function fetchIcsData(): Promise<Event[]> {
-        try {
-            const response = await fetch("https://api.omu-aikido.com/calendar");
-            if (!response.ok) {
-                throw new Error(
-                    `Failed to fetch ICS data: ${response.statusText}`
-                );
-            }
-            const data = await response.text();
-            ics_str = data;
-            return parseIcsData(); // データをパース
-        } catch (error) {
-            console.error(error);
-            return [];
-        }
-    }
-
-    // ICSデータをパースしてイベントを抽出する関数
-    function parseIcsData(): Event[] {
-        if (!ics_str) return [];
-
-        try {
-            // ts-icsのparseICS関数でICSデータをパース
-            const parsedData = icsCalendarToObject(ics_str);
-
-            if (parsedData && parsedData.events) {
-                // イベント情報を抽出して格納
-                return parsedData.events.map((event: VEvent) => ({
-                    summary: event.summary || "No Title",
-                    start: new Date(event.start.date), // 明示的にDate型へ変換
-                    end: event.end?.date ? new Date(event.end.date) : null,
-                }));
-            }
-        } catch (error) {
-            console.error("Error parsing ICS data:", error);
-        }
-        return [];
-    }
-
-    document.addEventListener("DOMContentLoaded", async () => {
-        const allEvents = (await fetchIcsData().catch(console.error)) ?? [];
-
-        const events = sortEvent(allEvents);
-        // ページがロードされたら、データを表示
-        if (events) {
-            removeProgressCircle();
-            renderEvents(events);
-        } else {
-            console.error("No upcoming events found.");
-        }
-    });
-
-    //開始時間で並び替え
-    function sortEvent(events: Event[]) {
-        return events.sort((a, b) => {
-            return new Date(a.start).getTime() - new Date(b.start).getTime();
-        });
-    }
-
-    // DOMに書き込む
-    function renderEvents(events: Event[]) {
-        const timeTable = document.querySelector(".timeTable");
-        if (!timeTable) return;
-        // イベントが空の場合のメッセージ
-        if (events.length === 0) {
-            const noEventsDiv = document.createElement("div");
-            noEventsDiv.classList.add("no-events");
-            noEventsDiv.textContent = "予定はありません";
-            timeTable.appendChild(noEventsDiv);
-            return;
-        }
-
-        // イベントを年月でグループ化
-        const groupedEvents = events.reduce(
-            (groups: { [key: string]: Event[] }, event) => {
-                const date = event.start;
-                const yearMonth = `${date.getFullYear()}年${date.getMonth() + 1}月`;
-                if (!groups[yearMonth]) {
-                    groups[yearMonth] = [];
-                }
-                groups[yearMonth].push(event);
-                return groups;
-            },
-            {}
-        );
-
-        // グループ化されたイベントを表示
-        Object.entries(groupedEvents).forEach(([yearMonth, monthEvents]) => {
-            // 年月のヘッダーを作成
-            const monthHeader = document.createElement("h2");
-            monthHeader.textContent = yearMonth;
-            monthHeader.style.marginTop = "2rem";
-            monthHeader.style.marginBottom = "1rem";
-            timeTable.appendChild(monthHeader);
-
-            // その月のイベントを表示
-            monthEvents.forEach((event) => {
-                const eventDiv = document.createElement("div");
-                eventDiv.classList.add("event");
-
-                const titleEl = document.createElement("div");
-                titleEl.classList.add("event-title");
-                titleEl.textContent = event.summary;
-
-                // Add class based on text content
-                if (event.summary.includes("中百舌鳥")) {
-                    titleEl.classList.add("sapphire");
-                } else if (event.summary.includes("杉本")) {
-                    titleEl.classList.add("green");
-                }
-
-                const timeEl = document.createElement("div");
-                timeEl.classList.add("event-time");
-
-                if (
-                    event.end &&
-                    event.start.toDateString() !== event.end.toDateString()
-                ) {
-                    const startDate = event.start.toLocaleString("ja-JP", {
-                        month: "long",
-                        day: "numeric",
-                    });
-                    const endDate = event.end?.toLocaleString("ja-JP", {
-                        month: "long",
-                        day: "numeric",
-                    });
-                    timeEl.textContent = `${startDate} ~ ${endDate}`;
-                } else {
-                    const startDate = event.start.toLocaleString("ja-JP", {
-                        month: "long",
-                        day: "numeric",
-                        hour: "numeric",
-                        minute: "numeric",
-                        hour12: false,
-                    });
-                    const endTime = event.end?.toLocaleString("ja-JP", {
-                        hour: "numeric",
-                        minute: "numeric",
-                        hour12: false,
-                    });
-                    timeEl.textContent = `${startDate} ~ ${endTime}`;
-                }
-                timeTable.appendChild(eventDiv);
-                eventDiv.appendChild(titleEl);
-                eventDiv.appendChild(timeEl);
-            });
-        });
-    }
-
-    function removeProgressCircle() {
-        const progressCircle = document.querySelector(".progress-circle");
-        if (progressCircle) {
-            progressCircle.remove();
-        }
-    }
-</script>
