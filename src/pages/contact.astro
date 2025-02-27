@@ -77,7 +77,7 @@ if (Astro.request.method === "POST") {
         const hasErrors = Object.values(errors).some((msg) => msg);
         if (!hasErrors) {
             // ここで実際にメール送信処理を実行
-            const response = await sendMail(
+            const response = await sendForm(
                 name as string,
                 email as string,
                 msg as string
@@ -100,59 +100,28 @@ if (Astro.request.method === "POST") {
     }
 }
 
-async function sendMail(name: string, email: string, msg: string) {
-    const sender = "大阪公立大学合氣道部";
-    const senderEmail = "noreply@omu-aikido.com";
-    const recipientEmail = "aikido.omu@gmail.com";
-    const toAdminRes = await fetch("https://api.mailchannels.net/tx/v1/send", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            personalizations: [
-                {
-                    to: [{ email: recipientEmail }],
-                },
-            ],
-            from: { email: senderEmail, name: sender },
-            subject: "お問い合わせがありました",
-            content: [
-                {
-                    type: "text/plain",
-                    value: `【お名前】\n${name}様\n【メールアドレス】\n${email}\n【お問い合わせ内容】\n${msg}`,
-                },
-            ],
-        }),
-    });
-
-    if (toAdminRes.ok) {
-        await fetch("https://api.mailchannels.net/tx/v1/send", {
+async function sendForm(name: string, email: string, msg: string) {
+    try {
+        const googleFormUrl =
+            "https://docs.google.com/forms/d/e/1FAIpQLSchtw1jUUb-myThkbJWbDBnRqXXuKHVhFwQ8RMNS9iZ8vUt7Q/formResponse";
+        const googleFormData = new FormData();
+        googleFormData.append("entry.1687999543", name); // nameフィールド用のエントリーID
+        googleFormData.append("entry.943302473", email); // emailフィールド用のエントリーID
+        googleFormData.append("entry.1694948814", msg); // messageフィールド用のエントリーID
+        const response = await fetch(googleFormUrl, {
             method: "POST",
-            headers: {
-                "content-type": "application/json",
-            },
-            body: JSON.stringify({
-                personalizations: [
-                    {
-                        to: [{ email }],
-                    },
-                ],
-                from: { email: senderEmail, name: sender },
-                subject: "お問い合わせありがとうございます",
-                content: [
-                    {
-                        type: "text/plain",
-                        value: `${name}様\n大阪公立大学合氣道部です。\nこの度はお問い合わせいただきありがとうございます。以下の内容でお問い合わせを受け付けました。\n【お問い合わせ内容】\n${msg}`,
-                    },
-                ],
-            }),
+            body: googleFormData,
         });
-
-        return new Response("送信に成功しました！", { status: 200 });
+        if (response.ok) {
+            return new Response("送信が完了しました。", { status: 200 });
+        } else {
+            console.error(await response.text());
+            return new Response("送信に失敗しました。", { status: 500 });
+        }
+    } catch (e) {
+        console.error(e);
+        return new Response("送信に失敗しました。", { status: 500 });
     }
-
-    return new Response("送信に失敗しました。", { status: 500 });
 }
 ---
 
