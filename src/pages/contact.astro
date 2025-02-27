@@ -251,7 +251,7 @@ async function sendMail(name: string, email: string, msg: string) {
 <script lang="js" define:vars={{ siteKey: TURNSTILE_SITE_KEY }}>
     window.onloadTurnstileCallback = function () {
         turnstile.render("#turnstile-container", {
-            sitekey: TURNSTILE_SITE_KEY,
+            sitekey: siteKey,
             callback: function (token) {
                 console.log(`Challenge Success ${token}`);
             },
