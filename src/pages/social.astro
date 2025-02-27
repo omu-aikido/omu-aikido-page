@@ -1,0 +1,91 @@
+---
+import { default as Layout } from "@/src/layouts/static-layout.astro";
+---
+
+<Layout title="SNS">
+    <div class="contact-container">
+        <section class="sns-section">
+            <h2>SNS</h2>
+            <div class="sns-grid">
+                <a href="https://twitter.com/fudaiaiki" class="sns-card">
+                    <div>
+                        <h4>ツイッター<br />旧府大体育会合氣道部</h4>
+                        <p>@fudaiaiki</p>
+                    </div>
+                </a>
+                <a href="https://twitter.com/new_ocuaikido" class="sns-card">
+                    <div>
+                        <h4>ツイッター<br />旧市大合気道サークル</h4>
+                        <p>@new_ocuaikido</p>
+                    </div>
+                </a>
+                <a
+                    href="https://www.instagram.com/hamudaiaikidoubu/"
+                    class="sns-card"
+                >
+                    <div>
+                        <h4>Instagram</h4>
+                        <p>@hamudaiaikidoubu</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="mail-section">
+            <h2>Mail</h2>
+            <div class="sns-grid">
+                <a href="mailto:new.ocuaikido@gmail.com" class="mail-card">
+                    <div>
+                        <h4>Gmail</h4>
+                        <p>new.ocuaikido@gmail.com</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+    </div>
+</Layout>
+
+<style>
+    section {
+        margin-bottom: 4rem;
+    }
+
+    h2 {
+        border-bottom: 3px solid var(--surface0);
+    }
+
+    h4 {
+        padding-bottom: 0.75rem;
+        color: rgb(var(--text));
+        letter-spacing: 0.05em;
+    }
+
+    .sns-grid {
+        display: grid;
+        gap: 2rem;
+    }
+
+    @media (min-width: 800px) {
+        .sns-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .sns-card,
+    .mail-card {
+        padding: 0.5rem 1rem;
+        background: rgb(var(--surface0));
+        border-radius: 1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid transparent;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .sns-card:hover,
+    .mail-card:hover {
+        transform: translateY(-4px) scale(1.02);
+        background: rgb(var(--surface1));
+        border-color: rgb(var(--blue));
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+    }
+</style>
