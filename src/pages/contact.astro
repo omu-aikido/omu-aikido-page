@@ -39,6 +39,11 @@ if (Astro.request.method === "POST") {
                 "お問い合わせ内容は必須です。日本語で入力してください。";
         }
 
+        console.log(name, email, msg);
+        console.log(data.get("cf-turnstile-response"));
+        console.log(TURNSTILE_SECRET_KEY);
+        console.log(TURNSTILE_SITE_KEY);
+
         // Turnstileトークンの検証
         const token = data.get("cf-turnstile-response");
         if (!token) {
@@ -48,7 +53,10 @@ if (Astro.request.method === "POST") {
             const formData = new FormData();
             formData.append("secret", TURNSTILE_SECRET_KEY);
             formData.append("response", token.toString());
-            formData.append("remoteip", Astro.clientAddress);
+            formData.append(
+                "remoteip",
+                Astro.request.headers.get("CF-Connecting-IP") || ""
+            );
 
             const turnstileResult = await fetch(
                 "https://challenges.cloudflare.com/turnstile/v0/siteverify",
@@ -221,7 +229,11 @@ async function sendMail(name: string, email: string, msg: string) {
                     {errors.msg && <p class="error">{errors.msg}</p>}
 
                     {/* Turnstileウィジェット */}
-                    <div id="turnstile-widget" class="turnstile-container" />
+                    <div
+                        id="turnstile-widget"
+                        class="turnstile-container"
+                        data-sitekey={TURNSTILE_SITE_KEY}
+                    />
                     {errors.turnstile && (
                         <p class="error">{errors.turnstile}</p>
                     )}
@@ -239,27 +251,6 @@ async function sendMail(name: string, email: string, msg: string) {
     <p>弊部へのご連絡はSNS/メールアドレスからも可能です。</p>
     <a href="/social">SNS/メールアドレス一覧</a>
 </Layout>
-
-<script define:vars={{ siteKey: TURNSTILE_SITE_KEY }}>
-    // Turnstileウィジェットが読み込まれた後のコールバック
-    window.onloadTurnstileCallback = function () {
-        turnstile.render("#turnstile-widget", {
-            sitekey: siteKey,
-            theme: "light",
-            callback: function () {
-                // Turnstileの検証が成功したら送信ボタンを有効化
-                document
-                    .getElementById("submit-button")
-                    .removeAttribute("disabled");
-            },
-        });
-    };
-</script>
-
-<script
-    src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback"
-    async
-    defer></script>
 
 <style>
     .error {
