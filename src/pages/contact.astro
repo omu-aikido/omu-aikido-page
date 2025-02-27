@@ -103,7 +103,7 @@ if (Astro.request.method === "POST") {
 async function sendForm(name: string, email: string, msg: string) {
     try {
         const googleFormUrl =
-            "https://docs.google.com/forms/d/e/1-d4DeuXpmjGzMG-M6jgD5XdUtWMbqkcW1dbYuAF7ZLE/formResponse";
+            "https://docs.google.com/forms/d/e/1FAIpQLSchtw1jUUb-myThkbJWbDBnRqXXuKHVhFwQ8RMNS9iZ8vUt7Q/formResponse";
         const googleFormData = new FormData();
         googleFormData.append("entry.1687999543", name); // nameフィールド用のエントリーID
         googleFormData.append("entry.943302473", email); // emailフィールド用のエントリーID
@@ -115,7 +115,7 @@ async function sendForm(name: string, email: string, msg: string) {
         if (response.ok) {
             return new Response("送信が完了しました。", { status: 200 });
         } else {
-            console.error(await response.json());
+            console.error(await response.text());
             return new Response("送信に失敗しました。", { status: 500 });
         }
     } catch (e) {
