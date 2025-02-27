@@ -39,10 +39,7 @@ if (Astro.request.method === "POST") {
                 "お問い合わせ内容は必須です。日本語で入力してください。";
         }
 
-        console.log(name, email, msg);
         console.log(data.get("cf-turnstile-response"));
-        console.log(TURNSTILE_SECRET_KEY);
-        console.log(TURNSTILE_SITE_KEY);
 
         // Turnstileトークンの検証
         const token = data.get("cf-turnstile-response");
@@ -229,11 +226,7 @@ async function sendMail(name: string, email: string, msg: string) {
                     {errors.msg && <p class="error">{errors.msg}</p>}
 
                     {/* Turnstileウィジェット */}
-                    <div
-                        id="turnstile-widget"
-                        class="turnstile-container"
-                        data-sitekey={TURNSTILE_SITE_KEY}
-                    />
+                    <div class="turnstile-container" />
                     {errors.turnstile && (
                         <p class="error">{errors.turnstile}</p>
                     )}
@@ -251,6 +244,20 @@ async function sendMail(name: string, email: string, msg: string) {
     <p>弊部へのご連絡はSNS/メールアドレスからも可能です。</p>
     <a href="/social">SNS/メールアドレス一覧</a>
 </Layout>
+
+<script
+    src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback"
+    defer></script>
+<script lang="js" define:vars={{ siteKey: TURNSTILE_SITE_KEY }}>
+    window.onloadTurnstileCallback = function () {
+        turnstile.render("#turnstile-container", {
+            sitekey: TURNSTILE_SITE_KEY,
+            callback: function (token) {
+                console.log(`Challenge Success ${token}`);
+            },
+        });
+    };
+</script>
 
 <style>
     .error {
@@ -329,12 +336,3 @@ async function sendMail(name: string, email: string, msg: string) {
         color: rgb(var(--text));
     }
 </style>
-
-{/* フォームのボタンがクリックされたとき、サブミット後に内容をクリアする */}
-<script>
-    document.querySelector("form")?.addEventListener("submit", () => {
-        setTimeout(() => {
-            document.querySelector("form")?.reset();
-        }, 1000);
-    });
-</script>
