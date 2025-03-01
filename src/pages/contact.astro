@@ -30,13 +30,11 @@ if (Astro.request.method === "POST") {
             errors.email = "有効なメールアドレスを入力してください。";
         }
         const msg = data.get("msg");
-        if (
-            typeof msg !== "string" ||
-            msg.trim() === "" ||
-            !msg.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/)
-        ) {
+        if (typeof msg !== "string" || msg.trim() === "") {
+            errors.msg = "お問い合わせ内容は必須です。";
+        } else if (!msg.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/)) {
             errors.msg =
-                "お問い合わせ内容は必須です。日本語で入力してください。";
+                "スパム防止のため、必ず日本語を含む文章を入力するようお願い致します。";
         }
 
         // Turnstileトークンの検証
