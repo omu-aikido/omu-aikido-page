@@ -24,11 +24,12 @@ function extractTextFromAstro(content: string): string {
         .replace(
             /<a [^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a[^>]*>/g,
             (match, url, content) => {
+                const BASE_URL: string = "https://omu-aikido.com";
                 const textContent = content
                     .replace(/<[^>]*>/g, "")
                     .replace(/\s+/g, " ")
                     .trim();
-                return `[${textContent}](${url})`;
+                return `[${textContent}](${new URL(url, BASE_URL).toString()})`;
             }
         )
         .replace(/<h1[^>]*>(.*?)<\/h1>/g, "\n# $1")
@@ -124,7 +125,8 @@ async function collectFiles(
             entry.name === "components" ||
             entry.name === "styles" ||
             entry.name === "layouts" ||
-            entry.name === "contact.astro"
+            entry.name === "contact.astro" ||
+            entry.name === "news.astro"
         ) {
             continue;
         }
@@ -150,15 +152,19 @@ export const GET: APIRoute = async () => {
         // ファイルパスのリストを取得
         const files = await collectFiles(srcDir, projectRoot);
 
-        let markdownContent = "# Project Content\n\n";
+        let markdownContent = "# Contents\n\n---";
 
         // 各ファイルの内容を処理
         for (const file of files) {
-            const relativePath = path.relative(projectRoot, file);
+            const relativePath = path
+                .relative(projectRoot, file)
+                .replace("src/pages/", "").replace(".astro", "");
+            const BASE_URL: string = "https://omu-aikido.com";
+            const absoluteUrl: URL = new URL(relativePath, BASE_URL); // 型付きで検証
             const content = await fs.readFile(file, "utf-8");
             const ext = path.extname(file).toLowerCase();
 
-            markdownContent += `## ${relativePath}\n\n`;
+            markdownContent += `# ${absoluteUrl.toString()}\n\n`;
 
             if (ext === ".astro") {
                 const extractedText = extractTextFromAstro(content);

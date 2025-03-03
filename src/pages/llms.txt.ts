@@ -139,7 +139,8 @@ async function collectFiles(
             entry.name === "components" ||
             entry.name === "styles" ||
             entry.name === "layouts" ||
-            entry.name === "contact.astro"
+            entry.name === "contact.astro" ||
+            entry.name === "news.astro"
         ) {
             continue;
         }
@@ -172,6 +173,8 @@ export const GET: APIRoute = async () => {
         // 各ファイルの概要をリスト形式で追加
         for (const file of files) {
             const relativePath = path.relative(projectRoot, file);
+            const BASE_URL: string = "https://omu-aikido.com"; 
+            const url = new URL(relativePath, BASE_URL);
             const content = await fs.readFile(file, "utf-8");
             const ext = path.extname(file).toLowerCase();
 
@@ -184,7 +187,7 @@ export const GET: APIRoute = async () => {
             }
             // TITLEを<Layout title="...">から取得
             const title = extractTitle(content);
-            markdownContent += `- [${title}](${relativePath}): ${fileSummary}\n`;
+            markdownContent += `- [${title}](${url}): ${fileSummary}\n`;
         }
 
         // Optionalセクションを追加
