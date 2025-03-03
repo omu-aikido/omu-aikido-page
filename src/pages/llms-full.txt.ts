@@ -105,21 +105,6 @@ function extractTextFromAstro(content: string): string {
     return trimmedText.replace(/\n{2,}/g, "\n\n");
 }
 
-// 新規: テキストから最初の200文字を返すヘルパー関数
-function getSummary(text: string): string {
-    const summaryLength = 140;
-    const summary = text.replace(/\n+/g, " ").trim();
-    return summary.length > summaryLength
-        ? summary.slice(0, summaryLength) + "..."
-        : summary;
-}
-
-// 新規: <Layout title="...">からタイトルを抽出するヘルパー関数
-function extractTitle(content: string): string {
-    const match = content.match(/<Layout\s+title="([^"]+)"\s*>/);
-    return match ? match[1] : "TITLE";
-}
-
 // ディレクトリを再帰的に走査してファイルを収集する関数
 async function collectFiles(
     dir: string,
@@ -165,31 +150,26 @@ export const GET: APIRoute = async () => {
         // ファイルパスのリストを取得
         const files = await collectFiles(srcDir, projectRoot);
 
-        // テンプレート形式のマークダウン出力
-        let markdownContent =
-            "# 大阪公立大学合氣道部\n\n> 大阪公立大学合氣道部は大阪公立大学で活動する合気会公認道場、天之武産合氣塾道場所属の体育会部活動です。\n\n2022年の春より、大阪市立大学合気道サークルと大阪府立大学合氣道部が統合し、大阪公立大学合氣道部として活動しています。\n\n## Pages\n\n";
+        let markdownContent = "# Project Content\n\n";
 
-        // 各ファイルの概要をリスト形式で追加
+        // 各ファイルの内容を処理
         for (const file of files) {
             const relativePath = path.relative(projectRoot, file);
             const content = await fs.readFile(file, "utf-8");
             const ext = path.extname(file).toLowerCase();
 
-            let fileSummary = "";
+            markdownContent += `## ${relativePath}\n\n`;
+
             if (ext === ".astro") {
                 const extractedText = extractTextFromAstro(content);
-                fileSummary = getSummary(extractedText);
+                markdownContent += extractedText + "\n\n";
             } else {
-                fileSummary = getSummary(content);
+                // その他のファイルはそのまま追加
+                markdownContent += content + "\n\n";
             }
-            // TITLEを<Layout title="...">から取得
-            const title = extractTitle(content);
-            markdownContent += `- [${title}](${relativePath}): ${fileSummary}\n`;
-        }
 
-        // Optionalセクションを追加
-        markdownContent +=
-            "\n## Optional\n\n- [Site Map Index](https://omu-aikido.com/sitemap-index.xml)\n";
+            markdownContent += "---\n\n";
+        }
 
         return new Response(markdownContent, {
             headers: {
