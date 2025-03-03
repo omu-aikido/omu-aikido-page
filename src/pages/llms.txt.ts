@@ -4,6 +4,7 @@ import path from "node:path";
 
 // 処理対象の拡張子を定義
 const EXTENSIONS_TO_PROCESS = [".astro", ".md", ".mdx", ".txt"];
+const BASEURL = "https://omu-aikido.com";
 
 // Astroファイルからフロントマターとスクリプト、スタイルを除去してテキストのみを抽出し、HTMLをMarkdownに変換する関数
 function extractTextFromAstro(content: string): string {
@@ -28,7 +29,7 @@ function extractTextFromAstro(content: string): string {
                     .replace(/<[^>]*>/g, "")
                     .replace(/\s+/g, " ")
                     .trim();
-                return `[${textContent}](${url})`;
+                return `[${textContent}](${new URL(url, BASEURL).toString()})`;
             }
         )
         .replace(/<h1[^>]*>(.*?)<\/h1>/g, "\n# $1")
@@ -171,7 +172,11 @@ export const GET: APIRoute = async () => {
 
         // 各ファイルの概要をリスト形式で追加
         for (const file of files) {
-            const relativePath = path.relative(projectRoot, file);
+            const relativePath = path
+                .relative(projectRoot, file)
+                .replace("src/pages/", "")
+                .replace(/\.astro$/, "");
+            const url = new URL(relativePath, BASEURL).toString();
             const content = await fs.readFile(file, "utf-8");
             const ext = path.extname(file).toLowerCase();
 
@@ -184,7 +189,7 @@ export const GET: APIRoute = async () => {
             }
             // TITLEを<Layout title="...">から取得
             const title = extractTitle(content);
-            markdownContent += `- [${title}](${relativePath}): ${fileSummary}\n`;
+            markdownContent += `- [${title}](${url}): ${fileSummary}\n`;
         }
 
         // Optionalセクションを追加

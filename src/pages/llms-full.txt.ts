@@ -5,6 +5,8 @@ import path from "node:path";
 // 処理対象の拡張子を定義
 const EXTENSIONS_TO_PROCESS = [".astro", ".md", ".mdx", ".txt"];
 
+const BASEURL = "https://omu-aikido.com";
+
 // Astroファイルからフロントマターとスクリプト、スタイルを除去してテキストのみを抽出し、HTMLをMarkdownに変換する関数
 function extractTextFromAstro(content: string): string {
     const withoutFrontmatter = content.replace(/---[\s\S]*?---/, "");
@@ -28,7 +30,7 @@ function extractTextFromAstro(content: string): string {
                     .replace(/<[^>]*>/g, "")
                     .replace(/\s+/g, " ")
                     .trim();
-                return `[${textContent}](${url})`;
+                return `[${textContent}](${new URL(url, BASEURL).toString()})`;
             }
         )
         .replace(/<h1[^>]*>(.*?)<\/h1>/g, "\n# $1")
@@ -150,11 +152,15 @@ export const GET: APIRoute = async () => {
         // ファイルパスのリストを取得
         const files = await collectFiles(srcDir, projectRoot);
 
-        let markdownContent = "# Project Content\n\n";
+        let markdownContent = "# 大阪公立大学合氣道部\n\n---";
 
         // 各ファイルの内容を処理
         for (const file of files) {
-            const relativePath = path.relative(projectRoot, file);
+            const relativePath = path
+                .relative(projectRoot, file)
+                .replace("src/pages/", "")
+                .replace(/\.astro$/, "");
+            const url = new URL(relativePath, BASEURL).toString();
             const content = await fs.readFile(file, "utf-8");
             const ext = path.extname(file).toLowerCase();
 
