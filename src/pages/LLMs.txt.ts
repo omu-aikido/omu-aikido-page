@@ -114,6 +114,12 @@ function getSummary(text: string): string {
         : summary;
 }
 
+// 新規: <Layout title="...">からタイトルを抽出するヘルパー関数
+function extractTitle(content: string): string {
+    const match = content.match(/<Layout\s+title="([^"]+)"\s*>/);
+    return match ? match[1] : "TITLE";
+}
+
 // ディレクトリを再帰的に走査してファイルを収集する関数
 async function collectFiles(
     dir: string,
@@ -159,15 +165,16 @@ export const GET: APIRoute = async () => {
         // ファイルパスのリストを取得
         const files = await collectFiles(srcDir, projectRoot);
 
-        let markdownContent = "# Project Content\n\n";
+        // テンプレート形式のマークダウン出力
+        let markdownContent =
+            "# Title\n\n> Optional description goes here\n\nOptional details goes here\n\n## Section name\n\n";
 
-        // 各ファイルの概要を処理
+        // 各ファイルの概要をリスト形式で追加
         for (const file of files) {
             const relativePath = path.relative(projectRoot, file);
             const content = await fs.readFile(file, "utf-8");
             const ext = path.extname(file).toLowerCase();
 
-            markdownContent += `## ${relativePath}\n\n`;
             let fileSummary = "";
             if (ext === ".astro") {
                 const extractedText = extractTextFromAstro(content);
@@ -175,9 +182,14 @@ export const GET: APIRoute = async () => {
             } else {
                 fileSummary = getSummary(content);
             }
-            markdownContent += fileSummary + "\n\n";
-            markdownContent += "---\n\n";
+            // TITLEを<Layout title="...">から取得
+            const title = extractTitle(content);
+            markdownContent += `- [${title}](${relativePath}): ${fileSummary}\n`;
         }
+
+        // Optionalセクションを追加
+        markdownContent +=
+            "\n## Optional\n\n- [Site Map Index](https://omu-aikido.com/sitemap-index.xml)\n";
 
         return new Response(markdownContent, {
             headers: {
