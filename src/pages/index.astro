@@ -17,7 +17,8 @@ import backgroundImage from "@/src/assets/layers.webp";
             <Image
                 src={backgroundImage}
                 alt="背景画像"
-                quality={80}
+                quality="high"
+                densities={[0.25, 0.5, 1, 1.5, 2]}
                 loading="eager"
                 class="background-image"
             />
@@ -46,6 +47,7 @@ import backgroundImage from "@/src/assets/layers.webp";
                             src={image1}
                             alt="合気道の稽古風景1"
                             loading="eager"
+                            densities={[0.5, 1]}
                         />
                     </div>
                 </div>
@@ -55,6 +57,7 @@ import backgroundImage from "@/src/assets/layers.webp";
                             src={image2}
                             alt="合気道の稽古風景2"
                             loading="eager"
+                            densities={[0.5, 1]}
                         />
                     </div>
                 </div>
@@ -64,6 +67,7 @@ import backgroundImage from "@/src/assets/layers.webp";
                             src={image3}
                             alt="合気道の稽古風景3"
                             loading="eager"
+                            densities={[0.5, 1]}
                         />
                     </div>
                 </div>
@@ -73,6 +77,7 @@ import backgroundImage from "@/src/assets/layers.webp";
                             src={image4}
                             alt="合気道の稽古風景4"
                             loading="eager"
+                            densities={[0.5, 1]}
                         />
                     </div>
                 </div>
@@ -82,6 +87,7 @@ import backgroundImage from "@/src/assets/layers.webp";
                             src={image5}
                             alt="合気道の稽古風景5"
                             loading="eager"
+                            densities={[0.5, 1]}
                         />
                     </div>
                 </div>
