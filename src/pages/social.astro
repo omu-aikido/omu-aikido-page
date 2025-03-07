@@ -1,5 +1,6 @@
 ---
 import { default as Layout } from "@/src/layouts/static-layout.astro";
+import Icon from "@/src/components/root/Icon.astro";
 ---
 
 <Layout title="SNS">
@@ -7,26 +8,38 @@ import { default as Layout } from "@/src/layouts/static-layout.astro";
         <section class="sns-section">
             <h2>SNS</h2>
             <div class="sns-grid">
-                <a href="https://twitter.com/fudaiaiki" class="sns-card">
+                <a
+                    href="https://twitter.com/fudaiaiki"
+                    class="sns-card"
+                    id="sns-x-fudaiaiki"
+                >
                     <div>
+                        <Icon icon="twitter-logo" size="2rem" />
                         <h4>ツイッター<br />旧府大体育会合氣道部</h4>
-                        <p>@fudaiaiki</p>
                     </div>
+                    <p>@fudaiaiki</p>
                 </a>
-                <a href="https://twitter.com/new_ocuaikido" class="sns-card">
+                <a
+                    href="https://twitter.com/new_ocuaikido"
+                    class="sns-card"
+                    id="sns-x-newocuaikido"
+                >
                     <div>
+                        <Icon icon="twitter-logo" size="2rem" />
                         <h4>ツイッター<br />旧市大合気道サークル</h4>
-                        <p>@new_ocuaikido</p>
                     </div>
+                    <p>@new_ocuaikido</p>
                 </a>
                 <a
                     href="https://www.instagram.com/hamudaiaikidoubu/"
                     class="sns-card"
+                    id="sns-instagram"
                 >
                     <div>
+                        <Icon icon="instagram-logo" size="2rem" />
                         <h4>Instagram</h4>
-                        <p>@hamudaiaikidoubu</p>
                     </div>
+                    <p>@hamudaiaikidoubu</p>
                 </a>
             </div>
         </section>
@@ -34,11 +47,19 @@ import { default as Layout } from "@/src/layouts/static-layout.astro";
         <section class="mail-section">
             <h2>Mail</h2>
             <div class="sns-grid">
-                <a href="mailto:new.ocuaikido@gmail.com" class="mail-card">
+                <a href="contact" class="mail-card" id="contact-form">
                     <div>
-                        <h4>Gmail</h4>
-                        <p>new.ocuaikido@gmail.com</p>
+                        <Icon icon="paper-plane-tilt" size="2rem" />
+                        <h4>コンタクトフォーム</h4>
                     </div>
+                    <p>コンタクトフォームを開きます</p>
+                </a>
+                <a class="mail-card" id="copy-button">
+                    <div>
+                        <Icon icon="pencil-line" size="2rem" />
+                        <h4>メール</h4>
+                    </div>
+                    <p>info@omu-aikido.com<br />(クリックでコピーされます)</p>
                 </a>
             </div>
         </section>
@@ -55,14 +76,28 @@ import { default as Layout } from "@/src/layouts/static-layout.astro";
     }
 
     h4 {
-        padding-bottom: 0.75rem;
         color: rgb(var(--text));
         letter-spacing: 0.05em;
+    }
+
+    a {
+        color: rgb(var(--text));
     }
 
     .sns-grid {
         display: grid;
         gap: 2rem;
+    }
+
+    .mail-card {
+        margin-bottom: 8px;
+    }
+
+    .sns-card div,
+    .mail-card div {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
     }
 
     @media (min-width: 800px) {
@@ -81,11 +116,22 @@ import { default as Layout } from "@/src/layouts/static-layout.astro";
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
-    .sns-card:hover,
-    .mail-card:hover {
+    #sns-x-fudaiaiki:hover,
+    #sns-x-newocuaikido:hover,
+    #sns-instagram:hover,
+    #contact-form:hover,
+    #copy-button:hover {
         transform: translateY(-4px) scale(1.02);
-        background: rgb(var(--surface1));
-        border-color: rgb(var(--blue));
+        border-color: rgb(var(--sky));
+        /* color: rgb(var(--sky)); */
         box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
     }
 </style>
+
+<script>
+    const mail_tag = document.getElementById("copy-button");
+    mail_tag?.addEventListener("click", () => {
+        navigator.clipboard.writeText("info@omu-aikido.com");
+        alert("メールアドレスをコピーしました");
+    });
+</script>

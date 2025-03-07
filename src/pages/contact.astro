@@ -91,7 +91,6 @@ if (Astro.request.method === "POST") {
         submitted = true;
         submitSuccess = false;
         if (e instanceof Error) {
-            console.error(e.message);
             errorMessage =
                 "送信処理中にエラーが発生しました。後ほど再度お試しください。";
         }

@@ -5,6 +5,8 @@ import cloudflare from "@astrojs/cloudflare";
 
 import sitemap from "@astrojs/sitemap";
 
+import partytown from "@astrojs/partytown";
+
 // https://astro.build/config
 export default defineConfig({
     site: "https://omu-aikido.com",
@@ -17,5 +19,5 @@ export default defineConfig({
         platformProxy: { enabled: true },
     }),
 
-    integrations: [sitemap()],
+    integrations: [sitemap(), partytown()],
 });
