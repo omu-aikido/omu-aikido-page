@@ -17,8 +17,10 @@ import backgroundImage from "@/src/assets/layers.webp";
             <Image
                 src={backgroundImage}
                 alt="背景画像"
-                quality="high"
+                quality="mid"
                 widths={[540, 720, backgroundImage.width]}
+                sizes="100vw"
+                format="webp"
                 loading="eager"
                 class="background-image"
             />
@@ -29,7 +31,11 @@ import backgroundImage from "@/src/assets/layers.webp";
             <p>
                 大阪公立大学合気道部は、大阪公立大学中百舌鳥キャンパス、杉本キャンパスで活動する、体育会所属の合気道団体です。
             </p>
-            <a href="/about" class="hero-link">
+            <a
+                href="/about"
+                class="hero-link"
+                aria-label="大阪公立大学合気道部についてもっと詳しく知る"
+            >
                 <p>もっと知る</p>
             </a>
         </div>
@@ -40,6 +46,7 @@ import backgroundImage from "@/src/assets/layers.webp";
                 showNavigation={true}
                 showIndicators={true}
                 enableSwipe={true}
+                aria-label="合気道部の活動写真スライドショー"
             >
                 <div class="slide">
                     <div class="slide-content image-content">
@@ -48,6 +55,9 @@ import backgroundImage from "@/src/assets/layers.webp";
                             alt="合気道の稽古風景1"
                             loading="eager"
                             widths={[540, 720, image1.width]}
+                            sizes="(max-width: 815px) 100vw, 50vw"
+                            format="webp"
+                            quality="high"
                         />
                     </div>
                 </div>
@@ -56,8 +66,11 @@ import backgroundImage from "@/src/assets/layers.webp";
                         <Image
                             src={image2}
                             alt="合気道の稽古風景2"
-                            loading="eager"
+                            loading="lazy"
                             widths={[540, 720, image2.width]}
+                            sizes="(max-width: 815px) 100vw, 50vw"
+                            format="webp"
+                            quality="high"
                         />
                     </div>
                 </div>
@@ -66,8 +79,11 @@ import backgroundImage from "@/src/assets/layers.webp";
                         <Image
                             src={image3}
                             alt="合気道の稽古風景3"
-                            loading="eager"
+                            loading="lazy"
                             widths={[540, 720, image3.width]}
+                            sizes="(max-width: 815px) 100vw, 50vw"
+                            format="webp"
+                            quality="high"
                         />
                     </div>
                 </div>
@@ -76,8 +92,11 @@ import backgroundImage from "@/src/assets/layers.webp";
                         <Image
                             src={image4}
                             alt="合気道の稽古風景4"
-                            loading="eager"
+                            loading="lazy"
                             widths={[540, 720, image4.width]}
+                            sizes="(max-width: 815px) 100vw, 50vw"
+                            format="webp"
+                            quality="high"
                         />
                     </div>
                 </div>
@@ -86,8 +105,11 @@ import backgroundImage from "@/src/assets/layers.webp";
                         <Image
                             src={image5}
                             alt="合気道の稽古風景5"
-                            loading="eager"
+                            loading="lazy"
                             widths={[540, 720, image5.width]}
+                            sizes="(max-width: 815px) 100vw, 50vw"
+                            format="webp"
+                            quality="high"
                         />
                     </div>
                 </div>
@@ -95,49 +117,84 @@ import backgroundImage from "@/src/assets/layers.webp";
         </div>
     </div>
 
-    <NewsReader content="short" path="news" source="news" />
+    <NewsReader
+        content="short"
+        path="news"
+        source="news"
+        aria-label="最新のお知らせ"
+    />
 
-    <section class="what-is-aikido-section">
-        <a href="/about/what-is">
+    <section
+        class="what-is-aikido-section"
+        role="region"
+        aria-labelledby="aikido-heading"
+    >
+        <a href="/about/what-is" aria-label="合気道についての詳細を知る">
             <div class="wia-container">
                 <div class="what-is-aikido-link">
-                    <h2 style="margin: 0.5rem;" class="section-title">
+                    <h2
+                        id="aikido-heading"
+                        style="margin: 0.5rem;"
+                        class="section-title"
+                    >
                         合気道を知る>>>
                     </h2>
                 </div>
-                <div class="background"></div>
+                <div class="background" aria-hidden="true"></div>
             </div>
         </a>
     </section>
 
-    <section class="links-section">
-        <h2 class="section-title">サイト案内</h2>
+    <section
+        class="links-section"
+        role="navigation"
+        aria-labelledby="site-navigation"
+    >
+        <h2 id="site-navigation" class="section-title">サイト案内</h2>
         <div class="links-container">
-            <a href="/access" class="links-item">
+            <a
+                href="/access"
+                class="links-item"
+                aria-label="活動場所とアクセス方法を確認する"
+            >
                 <div class="links-icon">
-                    <i class="fas fa-map-marker-alt"></i>
+                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
                 </div>
                 <h4>活動場所</h4>
                 <p>稽古場所へのアクセス</p>
             </a>
 
-            <a href="/schedule" class="links-item">
+            <a
+                href="/schedule"
+                class="links-item"
+                aria-label="活動予定とスケジュールを確認する"
+            >
                 <div class="links-icon">
-                    <i class="fas fa-calendar-alt"></i>
+                    <i class="fas fa-calendar-alt" aria-hidden="true"></i>
                 </div>
                 <h4>活動予定</h4>
                 <p>リアルタイムで更新されるカレンダー</p>
             </a>
 
-            <a href="/social" class="links-item">
-                <div class="links-icon"><i class="fas fa-users"></i></div>
+            <a
+                href="/social"
+                class="links-item"
+                aria-label="SNS公式アカウントを確認する"
+            >
+                <div class="links-icon">
+                    <i class="fas fa-users" aria-hidden="true"></i>
+                </div>
                 <h4>SNS</h4>
                 <p>公式アカウントへのリンク</p>
             </a>
 
-            <a href="/about/links" class="links-item">
+            <a
+                href="/about/links"
+                class="links-item"
+                aria-label="関連団体サイトリンク集を見る"
+            >
                 <div class="links-icon">
-                    <i class="fas fa-link"></i>
+                    <i class="fas fa-link" aria-hidden="true"></i>
                 </div>
                 <h4>リンク集</h4>
                 <p>関連団体サイトへのリンク</p>
@@ -145,15 +202,23 @@ import backgroundImage from "@/src/assets/layers.webp";
         </div>
     </section>
 
-    <section class="contact-section">
+    <section
+        class="contact-section"
+        role="region"
+        aria-labelledby="contact-heading"
+    >
         <div class="contact-container">
             <div class="contact-text">
-                <h2>お気軽にお問い合わせください</h2>
+                <h2 id="contact-heading">お気軽にお問い合わせください</h2>
                 <p>見学・体験・入部に関するご質問など、お待ちしています</p>
             </div>
-            <a href="/contact" class="contact-button">
+            <a
+                href="/contact"
+                class="contact-button"
+                aria-label="お問い合わせフォームに進む"
+            >
                 <span>お問い合わせ</span>
-                <i class="fas fa-arrow-right"></i>
+                <i class="fas fa-arrow-right" aria-hidden="true"></i>
             </a>
         </div>
     </section>
@@ -559,8 +624,10 @@ import backgroundImage from "@/src/assets/layers.webp";
         max-width: 25rem;
         margin: 0 auto;
     }
+
     .background {
         border: 1.4px solid transparent;
+        background-position-x: 0%;
         border-radius: 8px;
         background: linear-gradient(
                 48deg,
@@ -569,8 +636,6 @@ import backgroundImage from "@/src/assets/layers.webp";
                 rgb(var(--sapphire))
             )
             0% center/300%;
-        animation: box_color 9s linear infinite;
-        animation: rolate 3s linear infinite;
         -webkit-mask:
             linear-gradient(#fff 0 0) padding-box,
             linear-gradient(#fff 0 0) border-box;
@@ -586,6 +651,10 @@ import backgroundImage from "@/src/assets/layers.webp";
         right: 0;
         bottom: 0;
         z-index: 0;
+    }
+    .wia-container:hover .background {
+        animation: box_color 9s linear infinite;
+        animation: rolate 3s linear infinite;
     }
     @keyframes rolate {
         0% {
