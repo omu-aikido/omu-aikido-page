@@ -12,6 +12,11 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
 
 <Layout title="ホーム">
     <div class="hero">
+        <div class="geometric-background" aria-hidden="true">
+            <div class="shape circle1"></div>
+            <div class="shape circle2"></div>
+            <div class="shape circle3"></div>
+        </div>
         <div class="hero-content">
             <h1 class="hero-title">大阪公立大学合気道部</h1>
             <p>
@@ -143,9 +148,6 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
                 class="links-item"
                 aria-label="活動場所とアクセス方法を確認する"
             >
-                <div class="links-icon">
-                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-                </div>
                 <h4>活動場所</h4>
                 <p>稽古場所へのアクセス</p>
             </a>
@@ -155,9 +157,6 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
                 class="links-item"
                 aria-label="活動予定とスケジュールを確認する"
             >
-                <div class="links-icon">
-                    <i class="fas fa-calendar-alt" aria-hidden="true"></i>
-                </div>
                 <h4>活動予定</h4>
                 <p>リアルタイムで更新されるカレンダー</p>
             </a>
@@ -167,9 +166,6 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
                 class="links-item"
                 aria-label="SNS公式アカウントを確認する"
             >
-                <div class="links-icon">
-                    <i class="fas fa-users" aria-hidden="true"></i>
-                </div>
                 <h4>SNS</h4>
                 <p>公式アカウントへのリンク</p>
             </a>
@@ -179,9 +175,6 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
                 class="links-item"
                 aria-label="関連団体サイトリンク集を見る"
             >
-                <div class="links-icon">
-                    <i class="fas fa-link" aria-hidden="true"></i>
-                </div>
                 <h4>リンク集</h4>
                 <p>関連団体サイトへのリンク</p>
             </a>
@@ -210,9 +203,181 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
     </section>
 </Layout>
 
+<script>
+    let lastScrollPosition = window.scrollY;
+    let scrollVelocity = 0;
+    const velocityFactor = 0.1;
+    const dampingFactor = 0.92;
+    let ticking = false;
+
+    function easeOutQuart(x: number): number {
+        return 1 - Math.pow(1 - x, 4);
+    }
+
+    function updateShapes() {
+        const currentScroll = window.scrollY;
+        const scrollPercent =
+            currentScroll /
+            (document.documentElement.scrollHeight - window.innerHeight);
+
+        // Calculate velocity with smoothing
+        scrollVelocity = (currentScroll - lastScrollPosition) * velocityFactor;
+        scrollVelocity *= dampingFactor; // Apply damping
+        lastScrollPosition = currentScroll;
+
+        const shapes = document.querySelectorAll<HTMLElement>(".shape");
+
+        shapes.forEach((shape: HTMLElement, index) => {
+            const baseTransform =
+                index === 0 ? -150 : index === 1 ? -100 : -125;
+            const moveRange = 300;
+            const rotateRange = 360;
+            const scaleRange = 0.3;
+
+            // Apply easing to the scroll percentage
+            const easedScroll = easeOutQuart(scrollPercent);
+
+            // Add velocity influence to movement
+            const velocityInfluence =
+                scrollVelocity * (index === 1 ? -1 : 1) * 0.5;
+            const movement =
+                baseTransform + moveRange * easedScroll + velocityInfluence;
+
+            // Smooth out rotation with easing
+            const rotation = rotateRange * easedScroll;
+
+            // Add subtle wave effect to scale
+            const wave = Math.sin(scrollPercent * Math.PI * 2 + index);
+            const scale =
+                1 + scaleRange * wave * 0.5 + Math.abs(scrollVelocity) * 0.05;
+
+            if (index === 0) {
+                shape.style.transform = `translateX(${movement}px) rotate(${rotation}deg) scale(${scale})`;
+            } else if (index === 1) {
+                shape.style.transform = `translateX(${-movement}px) rotate(${-rotation}deg) scale(${scale})`;
+            } else {
+                shape.style.transform = `translateX(${movement / 2}px) translateY(${-movement}px) rotate(${rotation / 2}deg) scale(${scale})`;
+            }
+        });
+
+        ticking = false;
+    }
+
+    window.addEventListener("scroll", () => {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                updateShapes();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+
+    // Initial update
+    updateShapes();
+</script>
+
 <style>
     section {
         margin-top: 2rem;
+    }
+
+    .geometric-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+        overflow: hidden;
+        mix-blend-mode: soft-light;
+    }
+
+    .shape {
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.15;
+        background: rgb(var(--blue));
+        transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: transform, scale, rotate;
+        backface-visibility: hidden;
+        transform-style: preserve-3d;
+    }
+
+    .circle1 {
+        width: clamp(200px, 30vw, 400px);
+        height: clamp(200px, 30vw, 400px);
+        left: -10vw;
+        top: 20%;
+        background: linear-gradient(
+            45deg,
+            rgb(var(--blue)),
+            rgb(var(--sapphire)),
+            rgb(var(--lavender))
+        );
+        animation: pulse1 15s infinite alternate;
+    }
+
+    .circle2 {
+        width: clamp(150px, 25vw, 300px);
+        height: clamp(150px, 25vw, 300px);
+        right: -8vw;
+        top: 40%;
+        background: linear-gradient(
+            -45deg,
+            rgb(var(--mauve)),
+            rgb(var(--pink)),
+            rgb(var(--rosewater))
+        );
+        animation: pulse2 12s infinite alternate;
+    }
+
+    .circle3 {
+        width: clamp(180px, 28vw, 350px);
+        height: clamp(180px, 28vw, 350px);
+        left: 45%;
+        top: 60%;
+        background: linear-gradient(
+            135deg,
+            rgb(var(--teal)),
+            rgb(var(--sky)),
+            rgb(var(--sapphire))
+        );
+        animation: pulse3 18s infinite alternate;
+    }
+
+    @keyframes pulse1 {
+        0% {
+            opacity: 0.8;
+            filter: blur(0px) hue-rotate(0deg);
+        }
+        100% {
+            opacity: 0.6;
+            filter: blur(2px) hue-rotate(90deg);
+        }
+    }
+
+    @keyframes pulse2 {
+        0% {
+            opacity: 0.6;
+            filter: blur(5px) hue-rotate(0deg);
+        }
+        100% {
+            opacity: 0.9;
+            filter: blur(0px) hue-rotate(-90deg);
+        }
+    }
+
+    @keyframes pulse3 {
+        0% {
+            opacity: 0.5;
+            filter: blur(0px) hue-rotate(0deg);
+        }
+        100% {
+            opacity: 0.8;
+            filter: blur(8px) hue-rotate(45deg);
+        }
     }
     .hero {
         position: relative;
@@ -270,8 +435,8 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
         padding: 4rem 2rem;
         background: linear-gradient(
             to bottom,
-            rgb(var(--base)),
-            rgb(var(--mantle))
+            rgb(var(--base) / 0.6),
+            rgb(var(--mantle) / 0.6)
         );
         border-radius: 1rem;
         margin: 3rem auto;
@@ -292,7 +457,8 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
         flex: 1;
         min-width: 250px;
         padding: 2rem;
-        background-color: rgb(var(--surface0));
+        background-color: rgb(var(--surface0) / 0.3);
+        backdrop-filter: blur(15px);
         border: 1px solid rgb(var(--surface2));
         border-radius: 12px;
         text-align: center;
@@ -304,13 +470,6 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
         flex-direction: column;
         align-items: center;
         justify-content: center;
-    }
-
-    .links-icon {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-        color: rgb(var(--sapphire));
-        transition: all 0.3s ease;
     }
 
     .links-item h4 {
@@ -327,21 +486,15 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
     }
 
     .links-item:hover {
-        border: 1px solid rgb(var(--green));
+        border: 1px solid rgb(var(--sky));
         transform: translateY(-8px);
-        background-color: rgb(var(--surface1));
+        background-color: rgb(var(--surface1) / 0.9);
         box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
     }
 
     .links-item:hover h4 {
-        color: rgb(var(--green));
+        color: rgb(var(--sky));
     }
-
-    .links-item:hover .links-icon {
-        color: rgb(var(--green));
-        transform: scale(1.1);
-    }
-
     .slide {
         width: 100%;
     }
@@ -453,31 +606,6 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
         max-width: 1000px;
     }
 
-    .links-item {
-        height: 100%;
-        padding: 1rem 2rem;
-        background-color: rgb(var(--surface0));
-        border: 1px solid rgb(var(--surface0));
-        border-radius: 8px;
-        text-align: center;
-        transition: transform 0.3s ease;
-        margin: 0 auto;
-    }
-
-    .links-item h4 {
-        color: rgb(var(--sapphire));
-    }
-
-    .links-item:hover {
-        border: 1px solid rgb(var(--green));
-        color: rgb(var(--green));
-        transform: translateY(-4px);
-    }
-
-    .links-item:hover h4 {
-        color: rgb(var(--green));
-    }
-
     .contact-section {
         padding: 3rem 2rem;
         margin: 4rem auto;
@@ -487,6 +615,7 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
             rgb(var(--blue) / 0.1),
             rgb(var(--sapphire) / 0.2)
         );
+        backdrop-filter: blur(10px);
         border-radius: 1rem;
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     }
