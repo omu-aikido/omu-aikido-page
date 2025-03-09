@@ -8,24 +8,10 @@ import image2 from "@/src/assets/78A41333-2C01-46AF-9417-AF191C90DA22.webp";
 import image3 from "@/src/assets/79F41C00-C965-4E2F-BE27-A3870AF38735.webp";
 import image4 from "@/src/assets/854691DD-9133-411B-92B1-898246981D1E.webp";
 import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
-import backgroundImage from "@/src/assets/layers.webp";
 ---
 
 <Layout title="ホーム">
     <div class="hero">
-        <div class="hero-background">
-            <Image
-                src={backgroundImage}
-                alt="背景画像"
-                quality="mid"
-                widths={[540, 720, backgroundImage.width]}
-                sizes="100vw"
-                format="webp"
-                loading="eager"
-                class="background-image"
-            />
-            <div class="overlay"></div>
-        </div>
         <div class="hero-content">
             <h1 class="hero-title">大阪公立大学合気道部</h1>
             <p>
@@ -244,25 +230,6 @@ import backgroundImage from "@/src/assets/layers.webp";
         width: 100%;
         height: 100%;
         z-index: -1;
-    }
-
-    .background-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-            rgb(var(--mantle) / 0.3),
-            rgb(var(--mantle) / 0.3)
-        );
-        backdrop-filter: blur(3px);
     }
 
     .hero-title {
