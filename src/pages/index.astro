@@ -214,7 +214,7 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
         return 1 - Math.pow(1 - x, 4);
     }
 
-    function updateShapes() {
+    function updateShapesMobile() {
         const currentScroll = window.scrollY;
         const scrollPercent =
             currentScroll /
@@ -263,6 +263,67 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
         ticking = false;
     }
 
+    function updateShapesPC() {
+        const currentScroll = window.scrollY;
+        const scrollPercent =
+            currentScroll /
+            (document.documentElement.scrollHeight - window.innerHeight);
+
+        // Calculate velocity with smoothing
+        scrollVelocity = (currentScroll - lastScrollPosition) * velocityFactor;
+        scrollVelocity *= dampingFactor; // Apply damping
+        lastScrollPosition = currentScroll;
+
+        const shapes = document.querySelectorAll<HTMLElement>(".shape");
+
+        shapes.forEach((shape: HTMLElement, index) => {
+            const baseTransform =
+                index === 0 ? -300 : index === 1 ? -200 : -250;
+            const moveRange = 600; // 大画面向けに移動範囲を拡大
+            const rotateRange = 720; // 回転範囲を拡大
+            const scaleRange = 0.5; // スケール範囲を拡大
+
+            // Apply easing to the scroll percentage
+            const easedScroll = easeOutQuart(scrollPercent);
+
+            // Add velocity influence to movement with enhanced effect
+            const velocityInfluence =
+                scrollVelocity * (index === 1 ? -1.5 : 1.5) * 0.8;
+            const movement =
+                baseTransform + moveRange * easedScroll + velocityInfluence;
+
+            // Enhanced rotation with additional wave effect
+            const rotation =
+                rotateRange * easedScroll +
+                Math.sin(scrollPercent * Math.PI * 4) * 45;
+
+            // Enhanced wave effect for scale
+            const wave = Math.sin(scrollPercent * Math.PI * 3 + index);
+            const scale =
+                1.2 + scaleRange * wave * 0.8 + Math.abs(scrollVelocity) * 0.08;
+
+            if (index === 0) {
+                shape.style.transform = `translateX(${movement}px) translateY(${movement / 4}px) rotate(${rotation}deg) scale(${scale})`;
+            } else if (index === 1) {
+                shape.style.transform = `translateX(${-movement}px) translateY(${-movement / 3}px) rotate(${-rotation}deg) scale(${scale})`;
+            } else {
+                shape.style.transform = `translateX(${movement / 2}px) translateY(${-movement * 1.2}px) rotate(${rotation / 2}deg) scale(${scale})`;
+            }
+        });
+
+        ticking = false;
+    }
+
+    // メディアクエリに基づいて適切な関数を呼び出す
+    const updateShapes = () => {
+        if (window.matchMedia("(min-width: 815px)").matches) {
+            updateShapesPC();
+        } else {
+            updateShapesMobile();
+        }
+    };
+
+    // スクロールイベントリスナー
     window.addEventListener("scroll", () => {
         if (!ticking) {
             requestAnimationFrame(() => {
@@ -273,7 +334,18 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
         }
     });
 
-    // Initial update
+    // リサイズイベントでも更新を行う
+    window.addEventListener("resize", () => {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                updateShapes();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+
+    // 初期更新
     updateShapes();
 </script>
 
