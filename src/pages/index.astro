@@ -197,7 +197,6 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
                 aria-label="お問い合わせフォームに進む"
             >
                 <span>お問い合わせ</span>
-                <i class="fas fa-arrow-right" aria-hidden="true"></i>
             </a>
         </div>
     </section>
@@ -220,9 +219,8 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
             currentScroll /
             (document.documentElement.scrollHeight - window.innerHeight);
 
-        // Calculate velocity with smoothing
         scrollVelocity = (currentScroll - lastScrollPosition) * velocityFactor;
-        scrollVelocity *= dampingFactor; // Apply damping
+        scrollVelocity *= dampingFactor;
         lastScrollPosition = currentScroll;
 
         const shapes = document.querySelectorAll<HTMLElement>(".shape");
@@ -243,10 +241,8 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
             const movement =
                 baseTransform + moveRange * easedScroll + velocityInfluence;
 
-            // Smooth out rotation with easing
             const rotation = rotateRange * easedScroll;
 
-            // Add subtle wave effect to scale
             const wave = Math.sin(scrollPercent * Math.PI * 2 + index);
             const scale =
                 1 + scaleRange * wave * 0.5 + Math.abs(scrollVelocity) * 0.05;
@@ -269,9 +265,8 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
             currentScroll /
             (document.documentElement.scrollHeight - window.innerHeight);
 
-        // Calculate velocity with smoothing
         scrollVelocity = (currentScroll - lastScrollPosition) * velocityFactor;
-        scrollVelocity *= dampingFactor; // Apply damping
+        scrollVelocity *= dampingFactor;
         lastScrollPosition = currentScroll;
 
         const shapes = document.querySelectorAll<HTMLElement>(".shape");
@@ -279,25 +274,21 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
         shapes.forEach((shape: HTMLElement, index) => {
             const baseTransform =
                 index === 0 ? -300 : index === 1 ? -200 : -250;
-            const moveRange = 600; // 大画面向けに移動範囲を拡大
-            const rotateRange = 720; // 回転範囲を拡大
-            const scaleRange = 0.5; // スケール範囲を拡大
+            const moveRange = 600;
+            const rotateRange = 720;
+            const scaleRange = 0.5;
 
-            // Apply easing to the scroll percentage
             const easedScroll = easeOutQuart(scrollPercent);
 
-            // Add velocity influence to movement with enhanced effect
             const velocityInfluence =
                 scrollVelocity * (index === 1 ? -1.5 : 1.5) * 0.8;
             const movement =
                 baseTransform + moveRange * easedScroll + velocityInfluence;
 
-            // Enhanced rotation with additional wave effect
             const rotation =
                 rotateRange * easedScroll +
                 Math.sin(scrollPercent * Math.PI * 4) * 45;
 
-            // Enhanced wave effect for scale
             const wave = Math.sin(scrollPercent * Math.PI * 3 + index);
             const scale =
                 1.2 + scaleRange * wave * 0.8 + Math.abs(scrollVelocity) * 0.08;
@@ -314,7 +305,6 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
         ticking = false;
     }
 
-    // メディアクエリに基づいて適切な関数を呼び出す
     const updateShapes = () => {
         if (window.matchMedia("(min-width: 815px)").matches) {
             updateShapesPC();
@@ -323,7 +313,6 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
         }
     };
 
-    // スクロールイベントリスナー
     window.addEventListener("scroll", () => {
         if (!ticking) {
             requestAnimationFrame(() => {
@@ -334,7 +323,6 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
         }
     });
 
-    // リサイズイベントでも更新を行う
     window.addEventListener("resize", () => {
         if (!ticking) {
             requestAnimationFrame(() => {
@@ -345,7 +333,6 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
         }
     });
 
-    // 初期更新
     updateShapes();
 </script>
 
@@ -363,13 +350,11 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
         pointer-events: none;
         z-index: -1;
         overflow: hidden;
-        mix-blend-mode: soft-light;
     }
 
     .shape {
         position: absolute;
         border-radius: 50%;
-        opacity: 0.15;
         background: rgb(var(--blue));
         transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
         will-change: transform, scale, rotate;
@@ -421,33 +406,33 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
 
     @keyframes pulse1 {
         0% {
-            opacity: 0.8;
+            opacity: 0.3;
             filter: blur(0px) hue-rotate(0deg);
         }
         100% {
-            opacity: 0.6;
+            opacity: 0.15;
             filter: blur(2px) hue-rotate(90deg);
         }
     }
 
     @keyframes pulse2 {
         0% {
-            opacity: 0.6;
+            opacity: 0.5;
             filter: blur(5px) hue-rotate(0deg);
         }
         100% {
-            opacity: 0.9;
+            opacity: 0.25;
             filter: blur(0px) hue-rotate(-90deg);
         }
     }
 
     @keyframes pulse3 {
         0% {
-            opacity: 0.5;
+            opacity: 0.25;
             filter: blur(0px) hue-rotate(0deg);
         }
         100% {
-            opacity: 0.8;
+            opacity: 0.15;
             filter: blur(8px) hue-rotate(45deg);
         }
     }
@@ -684,7 +669,7 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
         max-width: 1200px;
         background: linear-gradient(
             135deg,
-            rgb(var(--blue) / 0.1),
+            rgb(var(--blue) / 0.3),
             rgb(var(--sapphire) / 0.2)
         );
         backdrop-filter: blur(10px);
