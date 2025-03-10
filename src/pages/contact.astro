@@ -546,7 +546,6 @@ async function sendForm(name: string, email: string, msg: string) {
         padding: 0.75rem;
         background-color: rgb(var(--surface0));
         color: rgb(var(--text));
-        width: 100%;
     }
 
     input:focus,
@@ -556,12 +555,11 @@ async function sendForm(name: string, email: string, msg: string) {
         box-shadow: 0 0 0 3px rgba(var(--primary-500), 0.15);
     }
 
-    /* レスポンシブ対応の強化 */
     @media (max-width: 768px) {
-        form {
-            margin: 0;
+        form,
+        #contact-form {
+            margin: 0 1rem;
         }
-
         input,
         textarea,
         #submit-button {
@@ -569,7 +567,6 @@ async function sendForm(name: string, email: string, msg: string) {
         }
     }
 
-    /* 既存のスタイルの残り */
     .success-message {
         background-color: rgba(var(--green), 0.1);
         border: 1px solid rgb(var(--green));
@@ -586,6 +583,11 @@ async function sendForm(name: string, email: string, msg: string) {
     }
     button {
         cursor: pointer;
+    }
+    #turnstile-widget {
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     .turnstile-container {
         margin: 1rem 0;
