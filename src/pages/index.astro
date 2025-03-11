@@ -208,7 +208,7 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
     }
 
     function calculateShapeTransform(
-        scrollPercent: number,
+        cumulativeScrollAmount: number,
         scrollVelocity: number,
         shapeIndex: number,
         isMobile: boolean,
@@ -225,6 +225,7 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
                   baseScale: 1,
                   waveMultiplier: 0.5,
                   velocityScaleEffect: 0.05,
+                  scrollFactor: 0.1,
               }
             : {
                   baseTransform:
@@ -236,44 +237,43 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
                   baseScale: 1.2,
                   waveMultiplier: 0.8,
                   velocityScaleEffect: 0.08,
+                  scrollFactor: 0.15,
               };
 
-        const easedScroll = easeOutQuart(scrollPercent);
+        // スクロール量を適切な範囲に正規化
+        const normalizedScroll =
+            (cumulativeScrollAmount * params.scrollFactor) % 1000;
+        // 0～1の範囲に変換
+        const scrollCycle = (normalizedScroll / 1000) % 1;
+        const easedScroll = easeOutQuart(scrollCycle);
 
         const variationFactor = 1 + Math.max(-0.2, Math.min(0.2, variation));
 
         const velocityInfluence =
-            Math.max(-40, Math.min(40, scrollVelocity)) *
+            scrollVelocity *
             (shapeIndex === 1 ? -1 : 1) *
             (isMobile
                 ? params.velocityMultiplier
                 : params.velocityMultiplier * 1.5);
 
-        const maxMovement = isMobile ? 300 : 600;
+        // 動きの制限を大幅に緩和
         const baseMovement =
             params.baseTransform +
             params.moveRange * easedScroll * variationFactor;
-        const movement = Math.max(
-            -maxMovement,
-            Math.min(maxMovement, baseMovement + velocityInfluence)
-        );
+        const movement = baseMovement + velocityInfluence;
 
-        // 回転角度を制限
-        const maxRotation = isMobile ? 360 : 720;
+        // 回転の制限を撤廃
         let baseRotation = params.rotateRange * easedScroll * variationFactor;
         if (!isMobile) {
             baseRotation +=
-                Math.sin(scrollPercent * Math.PI * 4 * variationFactor) * 30; // 45から30に減少
+                Math.sin(scrollCycle * Math.PI * 4 * variationFactor) * 30;
         }
-        const rotation = Math.max(
-            -maxRotation,
-            Math.min(maxRotation, baseRotation)
-        );
+        const rotation = baseRotation;
 
         const waveIntensity = isMobile ? 0.7 : 0.8;
         const wave =
             Math.sin(
-                scrollPercent * Math.PI * (isMobile ? 2 : 3) * variationFactor +
+                scrollCycle * Math.PI * (isMobile ? 2 : 3) * variationFactor +
                     shapeIndex
             ) * waveIntensity;
 
@@ -302,80 +302,106 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
 
     let lastScrollPosition = window.scrollY;
     let scrollVelocity = 0;
-    const velocityFactor = 0.1;
-    const dampingFactor = 0.92;
-    let ticking = false;
+    let targetScrollVelocity = 0;
+    let cumulativeScrollAmount = 0;
+    let lastTimestamp = performance.now();
+    const velocityFactor = 0.08;
+    const velocitySmoothing = 0.92;
+    let animationFrameId: number | null = null;
 
     let scrollVariation = 0;
     let variationDirection = 1;
-    let lastVariationUpdate = 0;
+    let shapeRandomFactors = [Math.random(), Math.random(), Math.random()];
+    let lastShapePositions = [
+        { x: 0, y: 0, rotation: 0, scale: 1 },
+        { x: 0, y: 0, rotation: 0, scale: 1 },
+        { x: 0, y: 0, rotation: 0, scale: 1 },
+    ];
 
-    function updateShapesFromScroll() {
+    function updateShapesFromScroll(timestamp = performance.now()) {
+        if (animationFrameId !== null) {
+            cancelAnimationFrame(animationFrameId);
+        }
+
         const currentScroll = window.scrollY;
-        const scrollPercent =
-            currentScroll /
-            (document.documentElement.scrollHeight - window.innerHeight);
+        const scrollDelta = currentScroll - lastScrollPosition;
+        const deltaTime = timestamp - lastTimestamp;
 
-        scrollVelocity = (currentScroll - lastScrollPosition) * velocityFactor;
-        scrollVelocity = Math.max(
-            -5,
-            Math.min(5, scrollVelocity * dampingFactor)
-        );
+        // スムーズな速度計算
+        targetScrollVelocity =
+            (scrollDelta / Math.max(deltaTime, 16)) * velocityFactor * 1000;
+        scrollVelocity =
+            scrollVelocity * velocitySmoothing +
+            targetScrollVelocity * (1 - velocitySmoothing);
+
+        // スクロール量を累積 (より滑らかな累積)
+        cumulativeScrollAmount += Math.abs(scrollDelta) * 0.8;
+
         lastScrollPosition = currentScroll;
+        lastTimestamp = timestamp;
 
-        const now = Date.now();
-        if (now - lastVariationUpdate > 75) {
-            scrollVariation +=
-                (Math.random() * 0.1 - 0.04) * variationDirection;
+        // より滑らかな変化
+        scrollVariation += (Math.random() * 0.08 - 0.04) * variationDirection;
 
-            if (Math.abs(scrollVariation) > 0.25) {
-                variationDirection *= -1;
-                scrollVariation *= 1;
-            }
+        // 各形状の乱数要素も更新
+        shapeRandomFactors = shapeRandomFactors.map(
+            (factor) => factor + (Math.random() * 0.2 - 0.1)
+        );
 
-            lastVariationUpdate = now;
+        // 変化が大きくなりすぎたら方向を反転
+        if (Math.abs(scrollVariation) > 0.3) {
+            variationDirection *= -1;
+            scrollVariation *= 0.8;
         }
 
         const isMobile = !window.matchMedia("(min-width: 815px)").matches;
         const shapes = document.querySelectorAll(".shape");
 
         shapes.forEach((shape, index) => {
+            // 各図形に個別のランダム要素を適用
+            const shapeVariation = scrollVariation * shapeRandomFactors[index];
+
             const transform = calculateShapeTransform(
-                scrollPercent,
+                cumulativeScrollAmount,
                 scrollVelocity,
                 index,
                 isMobile,
-                scrollVariation
+                shapeVariation
             );
 
             (shape as HTMLElement).style.transform = transform;
         });
 
-        ticking = false;
+        // Schedule next frame
+        animationFrameId = requestAnimationFrame(updateShapesFromScroll);
     }
 
     window.addEventListener("scroll", () => {
-        if (!ticking) {
-            requestAnimationFrame(() => {
-                updateShapesFromScroll();
-            });
-            ticking = true;
+        if (animationFrameId === null) {
+            animationFrameId = requestAnimationFrame(updateShapesFromScroll);
         }
     });
 
     window.addEventListener("resize", () => {
-        if (!ticking) {
-            requestAnimationFrame(() => {
-                updateShapesFromScroll();
-            });
-            ticking = true;
+        if (animationFrameId === null) {
+            animationFrameId = requestAnimationFrame(updateShapesFromScroll);
+        }
+    });
+
+    // Cleanup
+    window.addEventListener("beforeunload", () => {
+        if (animationFrameId !== null) {
+            cancelAnimationFrame(animationFrameId);
         }
     });
 
     function randomizeCirclePositions() {
-        console.log("🎲 randomizeCirclePositions");
         const circles = document.querySelectorAll(".shape");
         const isMobile = !window.matchMedia("(min-width: 815px)").matches;
+
+        // 初期スクロール量をランダムに設定
+        cumulativeScrollAmount = Math.random() * 1000;
+        shapeRandomFactors = [Math.random(), Math.random(), Math.random()];
 
         circles.forEach((circle, index) => {
             let leftPos, topPos;
@@ -409,6 +435,11 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
 
             (circle as HTMLElement).style.top = `${topPos}%`;
         });
+
+        // 初期状態でも変形を適用
+        if (animationFrameId === null) {
+            animationFrameId = requestAnimationFrame(updateShapesFromScroll);
+        }
     }
 
     document.addEventListener("astro:after-swap", () => {
@@ -447,7 +478,7 @@ import image5 from "@/src/assets/B92DA480-D961-4060-913B-63634CDB05A6.webp";
         position: absolute;
         border-radius: 50%;
         background: rgb(var(--blue));
-        transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         will-change: transform, scale, rotate, opacity, filter;
         backface-visibility: hidden;
         transform-style: preserve-3d;
