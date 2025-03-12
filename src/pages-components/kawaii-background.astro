@@ -2,19 +2,21 @@
 
 ---
 
-<div class="geometric-background" aria-hidden="true">
+<div class="kawaii-background" aria-hidden="true">
     <div class="shape circle1"></div>
     <div class="shape circle2"></div>
     <div class="shape circle3"></div>
 </div>
 
 <script>
-    function easeOutQuart(x: number): number {
-        return 1 - Math.pow(1 - x, 4);
+    function easeInOutQuartEnhanced(x: number): number {
+        return x < 0.5
+            ? 16 * x * x * x * x * x
+            : 1 - Math.pow(-2 * x + 2, 5) / 2;
     }
 
     function calculateShapeTransform(
-        cumulativeScrollAmount: number,
+        scrollPosition: number,
         scrollVelocity: number,
         shapeIndex: number,
         isMobile: boolean,
@@ -23,8 +25,8 @@
         const params = isMobile
             ? {
                   baseTransform:
-                      shapeIndex === 0 ? -150 : shapeIndex === 1 ? -100 : -125,
-                  moveRange: 300,
+                      shapeIndex === 0 ? -80 : shapeIndex === 1 ? -100 : -125,
+                  moveRange: 200,
                   rotateRange: 360,
                   scaleRange: 0.3,
                   velocityMultiplier: 0.5,
@@ -35,8 +37,8 @@
               }
             : {
                   baseTransform:
-                      shapeIndex === 0 ? -300 : shapeIndex === 1 ? -200 : -250,
-                  moveRange: 600,
+                      shapeIndex === 0 ? -150 : shapeIndex === 1 ? -200 : -250,
+                  moveRange: 400,
                   rotateRange: 720,
                   scaleRange: 0.5,
                   velocityMultiplier: 0.8,
@@ -46,12 +48,61 @@
                   scrollFactor: 0.15,
               };
 
-        // スクロール量を適切な範囲に正規化
-        const normalizedScroll =
-            (cumulativeScrollAmount * params.scrollFactor) % 1000;
-        // 0～1の範囲に変換
-        const scrollCycle = (normalizedScroll / 1000) % 1;
-        const easedScroll = easeOutQuart(scrollCycle);
+        const windowHeight = window.innerHeight;
+        const windowWidth = window.innerWidth;
+
+        const maxAllowedOffscreen = isMobile ? 20 : 50;
+        const maxMovementX = windowWidth * 0.3 + maxAllowedOffscreen;
+        const maxMovementY = windowHeight * 0.2 + maxAllowedOffscreen;
+
+        const aspectRatio = windowWidth / windowHeight;
+
+        const aspectRatioFactor = aspectRatio / (16 / 9);
+
+        const docHeight =
+            Math.max(
+                document.body.scrollHeight,
+                document.body.offsetHeight,
+                document.documentElement.scrollHeight,
+                document.documentElement.offsetHeight
+            ) - windowHeight;
+
+        const shapeOffsets = [0.12, -0.15, 0.08];
+        const shapeFactors = [0.5, 0.7, 0.4];
+
+        const scrollCycleFactor = 1.37;
+
+        let normalizedScroll =
+            (scrollPosition / Math.max(1, docHeight)) * scrollCycleFactor;
+
+        let scrollProgress = Math.max(0, normalizedScroll);
+
+        const screenSizeAdjust = Math.max(
+            0.8,
+            Math.min(0.9, 1000 / windowWidth)
+        );
+
+        // より滑らかな動きのために、形状ごとに異なる周期でオフセットを適用
+        const cyclicOffsets = [
+            Math.sin(normalizedScroll * Math.PI * 2) * 0.05,
+            Math.cos(normalizedScroll * Math.PI * 2) * 0.07,
+            Math.sin(normalizedScroll * Math.PI * 3) * 0.03,
+        ];
+
+        scrollProgress = Math.max(
+            0,
+            Math.min(
+                1,
+                (scrollProgress +
+                    shapeOffsets[shapeIndex] +
+                    cyclicOffsets[shapeIndex]) *
+                    shapeFactors[shapeIndex] *
+                    screenSizeAdjust *
+                    aspectRatioFactor
+            )
+        );
+
+        const easedScroll = easeInOutQuartEnhanced(scrollProgress);
 
         const variationFactor = 1 + Math.max(-0.2, Math.min(0.2, variation));
 
@@ -62,24 +113,42 @@
                 ? params.velocityMultiplier
                 : params.velocityMultiplier * 1.5);
 
-        // 動きの制限を大幅に緩和
-        const baseMovement =
-            params.baseTransform +
-            params.moveRange * easedScroll * variationFactor;
-        const movement = baseMovement + velocityInfluence;
+        const screenSizeMovementFactor = Math.min(
+            1.0,
+            Math.max(0.5, windowWidth / 1600)
+        );
 
-        // 回転の制限を撤廃
+        const baseMovement =
+            (params.baseTransform + params.moveRange * easedScroll) *
+            screenSizeMovementFactor;
+
+        const limitedBaseMovement = Math.max(
+            -maxMovementX,
+            Math.min(maxMovementX, baseMovement)
+        );
+
+        const movement = Math.max(
+            -maxMovementX,
+            Math.min(maxMovementX, limitedBaseMovement + velocityInfluence)
+        );
+
         let baseRotation = params.rotateRange * easedScroll * variationFactor;
         if (!isMobile) {
+            const frequency = [4, 3, 5][shapeIndex];
             baseRotation +=
-                Math.sin(scrollCycle * Math.PI * 4 * variationFactor) * 30;
+                Math.sin(
+                    scrollProgress * Math.PI * frequency * variationFactor
+                ) * 30;
         }
         const rotation = baseRotation;
 
         const waveIntensity = isMobile ? 0.7 : 0.8;
+        const waveFrequency = isMobile
+            ? [2, 2.5, 1.8][shapeIndex]
+            : [3, 3.5, 2.8][shapeIndex];
         const wave =
             Math.sin(
-                scrollCycle * Math.PI * (isMobile ? 2 : 3) * variationFactor +
+                scrollProgress * Math.PI * waveFrequency * variationFactor +
                     shapeIndex
             ) * waveIntensity;
 
@@ -92,69 +161,86 @@
         const scale = Math.max(minScale, Math.min(maxScale, baseScale));
 
         if (shapeIndex === 0) {
+            const yMovement = movement / 4;
+            const limitedYMovement = Math.max(
+                -maxMovementY,
+                Math.min(maxMovementY, yMovement)
+            );
+
             return isMobile
                 ? `translateX(${movement}px) rotate(${rotation}deg) scale(${scale})`
-                : `translateX(${movement}px) translateY(${movement / 4}px) rotate(${rotation}deg) scale(${scale})`;
+                : `translateX(${movement}px) translateY(${limitedYMovement}px) rotate(${rotation}deg) scale(${scale})`;
         } else if (shapeIndex === 1) {
+            const yMovement = -movement / 3;
+            const limitedYMovement = Math.max(
+                -maxMovementY,
+                Math.min(maxMovementY, yMovement)
+            );
+
             return isMobile
                 ? `translateX(${-movement}px) rotate(${-rotation}deg) scale(${scale})`
-                : `translateX(${-movement}px) translateY(${-movement / 3}px) rotate(${-rotation}deg) scale(${scale})`;
+                : `translateX(${-movement}px) translateY(${limitedYMovement}px) rotate(${-rotation}deg) scale(${scale})`;
         } else {
+            const xMovement = movement / 2;
+            const limitedXMovement = Math.max(
+                -maxMovementX,
+                Math.min(maxMovementX, xMovement)
+            );
+
+            const yMovement = isMobile ? -movement : -movement * 1.2;
+            const limitedYMovement = Math.max(
+                -maxMovementY,
+                Math.min(maxMovementY, yMovement)
+            );
+
             return isMobile
-                ? `translateX(${movement / 2}px) translateY(${-movement}px) rotate(${rotation / 2}deg) scale(${scale})`
-                : `translateX(${movement / 2}px) translateY(${-movement * 1.2}px) rotate(${rotation / 2}deg) scale(${scale})`;
+                ? `translateX(${limitedXMovement}px) translateY(${limitedYMovement}px) rotate(${rotation / 2}deg) scale(${scale})`
+                : `translateX(${limitedXMovement}px) translateY(${limitedYMovement}px) rotate(${rotation / 2}deg) scale(${scale})`;
         }
     }
 
     let lastScrollPosition = window.scrollY;
     let scrollVelocity = 0;
     let targetScrollVelocity = 0;
-    let cumulativeScrollAmount = 0;
     let lastTimestamp = performance.now();
     const velocityFactor = 0.08;
     const velocitySmoothing = 0.92;
     let animationFrameId: number | null = null;
+    let isProcessingFrame = false;
+    let needsUpdate = false;
 
     let scrollVariation = 0;
     let variationDirection = 1;
     let shapeRandomFactors = [Math.random(), Math.random(), Math.random()];
-    let lastShapePositions = [
-        { x: 0, y: 0, rotation: 0, scale: 1 },
-        { x: 0, y: 0, rotation: 0, scale: 1 },
-        { x: 0, y: 0, rotation: 0, scale: 1 },
-    ];
 
     function updateShapesFromScroll(timestamp = performance.now()) {
-        if (animationFrameId !== null) {
-            cancelAnimationFrame(animationFrameId);
+        if (isProcessingFrame) {
+            needsUpdate = true;
+            return;
         }
+
+        isProcessingFrame = true;
+        animationFrameId = null;
 
         const currentScroll = window.scrollY;
         const scrollDelta = currentScroll - lastScrollPosition;
         const deltaTime = timestamp - lastTimestamp;
 
-        // スムーズな速度計算
         targetScrollVelocity =
             (scrollDelta / Math.max(deltaTime, 16)) * velocityFactor * 1000;
         scrollVelocity =
             scrollVelocity * velocitySmoothing +
             targetScrollVelocity * (1 - velocitySmoothing);
 
-        // スクロール量を累積 (より滑らかな累積)
-        cumulativeScrollAmount += Math.abs(scrollDelta) * 0.8;
-
         lastScrollPosition = currentScroll;
         lastTimestamp = timestamp;
 
-        // より滑らかな変化
         scrollVariation += (Math.random() * 0.08 - 0.04) * variationDirection;
 
-        // 各形状の乱数要素も更新
         shapeRandomFactors = shapeRandomFactors.map(
             (factor) => factor + (Math.random() * 0.2 - 0.1)
         );
 
-        // 変化が大きくなりすぎたら方向を反転
         if (Math.abs(scrollVariation) > 0.3) {
             variationDirection *= -1;
             scrollVariation *= 0.8;
@@ -164,11 +250,10 @@
         const shapes = document.querySelectorAll(".shape");
 
         shapes.forEach((shape, index) => {
-            // 各図形に個別のランダム要素を適用
             const shapeVariation = scrollVariation * shapeRandomFactors[index];
 
             const transform = calculateShapeTransform(
-                cumulativeScrollAmount,
+                currentScroll,
                 scrollVelocity,
                 index,
                 isMobile,
@@ -178,23 +263,25 @@
             (shape as HTMLElement).style.transform = transform;
         });
 
-        // Schedule next frame
-        animationFrameId = requestAnimationFrame(updateShapesFromScroll);
+        isProcessingFrame = false;
+
+        if (needsUpdate) {
+            needsUpdate = false;
+            requestAnimationFrame(updateShapesFromScroll);
+        }
     }
 
-    window.addEventListener("scroll", () => {
+    function scheduleUpdate() {
         if (animationFrameId === null) {
             animationFrameId = requestAnimationFrame(updateShapesFromScroll);
+        } else {
+            needsUpdate = false;
         }
-    });
+    }
 
-    window.addEventListener("resize", () => {
-        if (animationFrameId === null) {
-            animationFrameId = requestAnimationFrame(updateShapesFromScroll);
-        }
-    });
+    window.addEventListener("scroll", scheduleUpdate);
+    window.addEventListener("resize", scheduleUpdate);
 
-    // Cleanup
     window.addEventListener("beforeunload", () => {
         if (animationFrameId !== null) {
             cancelAnimationFrame(animationFrameId);
@@ -205,30 +292,25 @@
         const circles = document.querySelectorAll(".shape");
         const isMobile = !window.matchMedia("(min-width: 815px)").matches;
 
-        // 初期スクロール量をランダムに設定
-        cumulativeScrollAmount = Math.random() * 1000;
         shapeRandomFactors = [Math.random(), Math.random(), Math.random()];
 
         circles.forEach((circle, index) => {
             let leftPos, topPos;
 
             if (index === 0) {
-                // circle1
-                leftPos = Math.random() * 30 - 20; // -20% ~ 10%
-                topPos = Math.random() * 30 + 10; // 10% ~ 40%
+                leftPos = Math.random() * 25 - 5;
+                topPos = Math.random() * 20 + 15;
             } else if (index === 1) {
-                // circle2
-                leftPos = Math.random() * 30 + 60; // 60% ~ 90%
-                topPos = Math.random() * 30 + 25; // 25% ~ 55%
+                leftPos = Math.random() * 25 + 65;
+                topPos = Math.random() * 25 + 30;
             } else {
-                // circle3
-                leftPos = Math.random() * 50 + 25; // 25% ~ 75%
-                topPos = Math.random() * 30 + 45; // 45% ~ 75%
+                leftPos = Math.random() * 40 + 30;
+                topPos = Math.random() * 25 + 45;
             }
 
             if (isMobile) {
-                leftPos = leftPos * 0.8 + 10;
-                topPos = Math.min(topPos, 85);
+                leftPos = leftPos * 0.9 + 5;
+                topPos = Math.min(topPos, 80);
             }
 
             if (index === 1) {
@@ -242,19 +324,38 @@
             (circle as HTMLElement).style.top = `${topPos}%`;
         });
 
-        // 初期状態でも変形を適用
+        // 初期スクロール位置を少しランダムに設定して、ページロード時から動きを持たせる
+        if (!window.scrollY) {
+            // ランダムな初期スクロール位置を設定（ただし小さい値）
+            const initialScroll = Math.random() * 0.2;
+
+            // 各形状の変形を計算
+            const isMobile = !window.matchMedia("(min-width: 815px)").matches;
+            circles.forEach((circle, index) => {
+                const transform = calculateShapeTransform(
+                    initialScroll * document.body.scrollHeight,
+                    0,
+                    index,
+                    isMobile,
+                    shapeRandomFactors[index] * 0.5
+                );
+
+                (circle as HTMLElement).style.transform = transform;
+            });
+        }
+
         if (animationFrameId === null) {
             animationFrameId = requestAnimationFrame(updateShapesFromScroll);
         }
     }
 
-    document.addEventListener("astro:after-swap", () => {
+    document.addEventListener("astro:page-load", () => {
         randomizeCirclePositions();
     });
 </script>
 
 <style>
-    .geometric-background {
+    .kawaii-background {
         position: fixed;
         top: 0;
         left: 0;
@@ -280,16 +381,16 @@
         position: absolute;
         border-radius: 50%;
         background: rgb(var(--blue));
-        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
         will-change: transform, scale, rotate, opacity, filter;
         backface-visibility: hidden;
         transform-style: preserve-3d;
     }
 
     .circle1 {
-        width: clamp(200px, 30vw, 400px);
-        height: clamp(200px, 30vw, 400px);
-        left: -10vw;
+        width: clamp(180px, 25vw, 350px);
+        height: clamp(180px, 25vw, 350px);
+        left: -5vw;
         top: 20%;
         background: linear-gradient(
             45deg,
