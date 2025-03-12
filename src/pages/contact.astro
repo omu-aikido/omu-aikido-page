@@ -1,5 +1,5 @@
 ---
-import { default as Layout } from "@/src/layouts/static-layout.astro";
+import { default as Layout } from "@/src/pages-layouts/static-layout.astro";
 
 export const prerender = false;
 
@@ -16,20 +16,35 @@ let submitted = false;
 let submitSuccess = false;
 let errorMessage = "";
 
+// Store form values to repopulate on validation failure
+let formValues = {
+    name: "",
+    email: "",
+    msg: "",
+    turnstileRes: null as FormDataEntryValue | null,
+};
+
 if (Astro.request.method === "POST") {
     try {
         const data = await Astro.request.formData();
         const name = data.get("name");
+        formValues.name = typeof name === "string" ? name : "";
         if (typeof name !== "string" || name.trim() === "") {
             errors.name = "名前は必須です。";
         }
         const email = data.get("email");
+        formValues.email = typeof email === "string" ? email : "";
         if (typeof email !== "string" || email.trim() === "") {
             errors.email = "メールアドレスは必須です。";
-        } else if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        } else if (
+            !email.match(
+                /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+            )
+        ) {
             errors.email = "有効なメールアドレスを入力してください。";
         }
         const msg = data.get("msg");
+        formValues.msg = typeof msg === "string" ? msg : "";
         if (typeof msg !== "string" || msg.trim() === "") {
             errors.msg = "お問い合わせ内容は必須です。";
         } else if (!msg.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/)) {
@@ -38,14 +53,14 @@ if (Astro.request.method === "POST") {
         }
 
         // Turnstileトークンの検証
-        const token = data.get("cf-turnstile-response");
-        if (!token) {
+        formValues.turnstileRes = data.get("cf-turnstile-response");
+        if (!formValues.turnstileRes) {
             errors.turnstile = "ロボットでないことを確認してください。";
         } else {
             // Turnstileトークンをサーバーサイドで検証
             const formData = new FormData();
             formData.append("secret", TURNSTILE_SECRET_KEY);
-            formData.append("response", token.toString());
+            formData.append("response", formValues.turnstileRes.toString());
             formData.append(
                 "remoteip",
                 Astro.request.headers.get("CF-Connecting-IP") || ""
@@ -150,7 +165,7 @@ async function sendForm(name: string, email: string, msg: string) {
                     </button>
                 </div>
             ) : (
-                <form method="POST">
+                <form method="POST" id="contact-form">
                     <label for="name">
                         お名前
                         <span class="required-mark">*</span>
@@ -160,9 +175,13 @@ async function sendForm(name: string, email: string, msg: string) {
                         type="text"
                         name="name"
                         placeholder="山田太郎"
+                        value={formValues.name}
+                        class={errors.name ? "error-input" : ""}
                         required
                     />
-                    {errors.name && <p class="error">{errors.name}</p>}
+                    {errors.name && (
+                        <p class="error field-error">{errors.name}</p>
+                    )}
 
                     <label for="email">
                         メールアドレス
@@ -173,9 +192,13 @@ async function sendForm(name: string, email: string, msg: string) {
                         type="email"
                         name="email"
                         placeholder="example@mail.co.jp"
+                        value={formValues.email}
+                        class={errors.email ? "error-input" : ""}
                         required
                     />
-                    {errors.email && <p class="error">{errors.email}</p>}
+                    {errors.email && (
+                        <p class="error field-error">{errors.email}</p>
+                    )}
 
                     <label for="msg">
                         お問い合わせ内容
@@ -185,18 +208,31 @@ async function sendForm(name: string, email: string, msg: string) {
                         id="msg"
                         name="msg"
                         placeholder="お気軽にお問い合わせください。"
+                        value={formValues.msg}
+                        class={errors.msg ? "error-input" : ""}
                         required
                     />
-                    {errors.msg && <p class="error">{errors.msg}</p>}
+                    {errors.msg && (
+                        <p class="error field-error">{errors.msg}</p>
+                    )}
 
-                    {/* Turnstileウィジェット */}
-                    <div id="turnstile-widget" class="turnstile-container" />
+                    <div class="turnstile-wrapper">
+                        <div class="turnstile-overlay" id="turnstile-loading">
+                            <div class="spinner" />
+                            <p>認証を読み込み中...</p>
+                        </div>
+                        <div
+                            id="turnstile-widget"
+                            class="turnstile-container"
+                        />
+                    </div>
                     {errors.turnstile && (
-                        <p class="error">{errors.turnstile}</p>
+                        <p class="error field-error">{errors.turnstile}</p>
                     )}
 
                     <button id="submit-button" type="submit" disabled>
-                        送信
+                        <span class="button-text">送信</span>
+                        <span class="spinner button-spinner hidden" />
                     </button>
                 </form>
             )
@@ -209,28 +245,328 @@ async function sendForm(name: string, email: string, msg: string) {
     <a href="/social">SNS/メールアドレス一覧</a>
 </Layout>
 
-<script define:vars={{ siteKey: TURNSTILE_SITE_KEY }}>
-    window.onloadTurnstileCallback = function () {
-        turnstile.render("#turnstile-widget", {
-            sitekey: siteKey,
-            callback: function () {
-                document
-                    .getElementById("submit-button")
-                    .removeAttribute("disabled");
-            },
-        });
-    };
-</script>
-
 <script
-    src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback"
-    async
-    defer></script>
+    define:vars={{
+        siteKey: TURNSTILE_SITE_KEY,
+        hasErrors: Object.values(errors).some((e) => e),
+    }}
+>
+    // Turnstileウィジェット用の変数
+    let turnstileWidgetId;
+
+    // DOMContentLoadedでTurnstileが利用可能かチェックし、必要なら手動でロード
+    document.addEventListener("DOMContentLoaded", function () {
+        // フォームのSubmit処理にローディング状態を追加
+        setupFormSubmission();
+
+        // エラーがある場合は最初のエラーフィールドにフォーカス
+        if (hasErrors) {
+            focusFirstErrorField();
+        }
+
+        // Turnstileスクリプトが既にロードされているか確認
+        if (typeof turnstile === "undefined") {
+            // Turnstileスクリプトをロード
+            loadTurnstileScript();
+        } else {
+            // 既にロードされている場合は直接レンダリング
+            renderTurnstile();
+        }
+    });
+
+    // 最初のエラーフィールドにフォーカスする
+    function focusFirstErrorField() {
+        setTimeout(() => {
+            const errorFields = document.querySelectorAll(".error-input");
+            if (errorFields.length > 0) {
+                errorFields[0].focus();
+            }
+        }, 100);
+    }
+
+    // フォーム送信時の処理を設定
+    function setupFormSubmission() {
+        const form = document.getElementById("contact-form");
+        if (!form) return;
+
+        form.addEventListener("submit", function (e) {
+            // フォーム送信前にボタンの状態を確認
+            const submitButton = document.getElementById("submit-button");
+
+            // ボタンが無効化されている場合はフォーム送信をキャンセル
+            if (submitButton.hasAttribute("disabled")) {
+                e.preventDefault();
+                return false;
+            }
+
+            // 送信中の表示に切り替え
+            const buttonText = submitButton.querySelector(".button-text");
+            const buttonSpinner = submitButton.querySelector(".button-spinner");
+
+            buttonText.textContent = "送信中...";
+            buttonSpinner.classList.remove("hidden");
+
+            // フォーム送信は継続（ボタンは有効のまま）
+            return true;
+        });
+    }
+
+    // Turnstileスクリプトを動的にロードする関数
+    function loadTurnstileScript() {
+        const script = document.createElement("script");
+        script.src =
+            "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+        script.async = true;
+        script.defer = true;
+        script.onload = function () {
+            // スクリプトロード完了後にウィジェットをレンダリング
+            renderTurnstile();
+        };
+        document.head.appendChild(script);
+    }
+
+    // Turnstileウィジェットをレンダリングする関数
+    function renderTurnstile() {
+        // ウィジェットコンテナが存在するか確認
+        const widgetContainer = document.getElementById("turnstile-widget");
+        if (!widgetContainer) return;
+
+        // turnstileオブジェクトが利用可能か確認
+        if (typeof turnstile === "undefined") {
+            console.error("Turnstileが読み込まれていません");
+            return;
+        }
+
+        // 既存のウィジェットがあればリセット
+        if (turnstileWidgetId) {
+            try {
+                turnstile.reset(turnstileWidgetId);
+            } catch (e) {
+                console.log("Turnstileリセット中にエラーが発生しました:", e);
+            }
+        }
+
+        try {
+            // 新しいウィジェットをレンダリング
+            turnstileWidgetId = turnstile.render("#turnstile-widget", {
+                sitekey: siteKey,
+                callback: function (token) {
+                    // トークンが正常に生成されたら送信ボタンを有効化
+                    const submitButton =
+                        document.getElementById("submit-button");
+                    submitButton.removeAttribute("disabled");
+                    submitButton.classList.add("active");
+
+                    // ローディングオーバーレイを非表示に
+                    document
+                        .getElementById("turnstile-loading")
+                        .classList.add("loaded");
+                },
+                "expired-callback": function () {
+                    // トークンの期限切れで送信ボタンを無効化
+                    document
+                        .getElementById("submit-button")
+                        .setAttribute("disabled", "");
+                    document
+                        .getElementById("submit-button")
+                        .classList.remove("active");
+                },
+                "error-callback": function () {
+                    // エラー時も送信ボタンを無効化
+                    document
+                        .getElementById("submit-button")
+                        .setAttribute("disabled", "");
+                    document
+                        .getElementById("submit-button")
+                        .classList.remove("active");
+                    console.error("Turnstile検証中にエラーが発生しました");
+                },
+            });
+
+            // ウィジェットが描画され始めたらローディングオーバーレイを非表示に
+            setTimeout(() => {
+                const loadingElement =
+                    document.getElementById("turnstile-loading");
+                if (loadingElement) {
+                    loadingElement.classList.add("loaded");
+                }
+            }, 1500); // ウィジェットの描画に少し時間を与える
+        } catch (e) {
+            console.error("Turnstileレンダリング中にエラーが発生しました:", e);
+        }
+    }
+
+    // グローバル関数としてコールバックを定義（API読み込み時に呼ばれる）
+    window.onloadTurnstileCallback = function () {
+        renderTurnstile();
+    };
+
+    // エラーがある場合は特に確実にTurnstileを初期化
+    if (hasErrors) {
+        // 少し遅延させてDOMが完全に読み込まれてからTurnstileを初期化
+        setTimeout(function () {
+            if (typeof turnstile !== "undefined") {
+                renderTurnstile();
+            } else {
+                loadTurnstileScript();
+            }
+        }, 500);
+    }
+</script>
 
 <style>
     .error {
         color: rgb(var(--red));
     }
+    .field-error {
+        font-size: 0.85rem;
+        margin: 0.25rem 0 0.5rem 0;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-5px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .error-input {
+        border: 2px solid rgb(var(--red)) !important;
+        background-color: rgba(var(--red), 0.05);
+    }
+
+    .turnstile-wrapper {
+        position: relative;
+        min-height: 65px;
+        margin: 1rem 0;
+    }
+
+    .turnstile-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(var(--base));
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+        transition:
+            opacity 0.3s ease,
+            visibility 0.3s;
+        border-radius: 0.5rem;
+    }
+
+    .turnstile-overlay.loaded {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .turnstile-overlay p {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        color: rgb(var(--text));
+    }
+
+    .spinner {
+        width: 24px;
+        height: 24px;
+        border: 3px solid rgba(var(--text), 0.3);
+        border-radius: 50%;
+        border-top-color: rgb(var(--text));
+        animation: spin 1s linear infinite;
+    }
+
+    .button-spinner {
+        width: 18px;
+        height: 18px;
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 8px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s linear infinite;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    #submit-button {
+        background-color: rgb(var(--teal));
+        color: rgb(var(--base));
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #submit-button:not([disabled]):hover,
+    #submit-button.active:hover {
+        background-color: rgb(var(--sky));
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    #submit-button[disabled] {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    #submit-button.active {
+        opacity: 1;
+        cursor: pointer;
+        background-color: rgb(var(--teal));
+    }
+
+    input,
+    textarea {
+        transition: all 0.3s ease;
+        border: 2px solid rgb(var(--border));
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        background-color: rgb(var(--surface0));
+        color: rgb(var(--text));
+    }
+
+    input:focus,
+    textarea:focus {
+        outline: none;
+        border-color: rgb(var(--primary-500));
+        box-shadow: 0 0 0 3px rgba(var(--primary-500), 0.15);
+    }
+
+    @media (max-width: 768px) {
+        form,
+        #contact-form {
+            margin: 0 1rem;
+        }
+        input,
+        textarea,
+        #submit-button {
+            padding: 0.85rem;
+        }
+    }
+
     .success-message {
         background-color: rgba(var(--green), 0.1);
         border: 1px solid rgb(var(--green));
@@ -248,8 +584,14 @@ async function sendForm(name: string, email: string, msg: string) {
     button {
         cursor: pointer;
     }
+    #turnstile-widget {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
     .turnstile-container {
         margin: 1rem 0;
+        height: 60px;
     }
     button[disabled] {
         opacity: 0.6;

@@ -1,0 +1,473 @@
+---
+
+---
+
+<div class="kawaii-background" aria-hidden="true">
+    <div class="shape circle1"></div>
+    <div class="shape circle2"></div>
+    <div class="shape circle3"></div>
+</div>
+
+<script>
+    function easeInOutQuartEnhanced(x: number): number {
+        return x < 0.5
+            ? 16 * x * x * x * x * x
+            : 1 - Math.pow(-2 * x + 2, 5) / 2;
+    }
+
+    function calculateShapeTransform(
+        scrollPosition: number,
+        scrollVelocity: number,
+        shapeIndex: number,
+        isMobile: boolean,
+        variation: number = 0
+    ): string {
+        const params = isMobile
+            ? {
+                  baseTransform:
+                      shapeIndex === 0 ? -90 : shapeIndex === 1 ? -150 : -160,
+                  moveRange: 350,
+                  rotateRange: 520,
+                  scaleRange: 0.4,
+                  velocityMultiplier: 0.6,
+                  baseScale: 1,
+                  waveMultiplier: 0.5,
+                  velocityScaleEffect: 0.05,
+                  scrollFactor: 0.1,
+              }
+            : {
+                  baseTransform:
+                      shapeIndex === 0 ? -150 : shapeIndex === 1 ? -200 : -250,
+                  moveRange: 400,
+                  rotateRange: 720,
+                  scaleRange: 0.5,
+                  velocityMultiplier: 0.8,
+                  baseScale: 1.2,
+                  waveMultiplier: 0.8,
+                  velocityScaleEffect: 0.08,
+                  scrollFactor: 0.15,
+              };
+
+        const windowHeight = window.innerHeight;
+        const windowWidth = window.innerWidth;
+
+        const maxAllowedOffscreen = isMobile ? 20 : 50;
+        const maxMovementX = windowWidth * 0.3 + maxAllowedOffscreen;
+        const maxMovementY = windowHeight * 0.2 + maxAllowedOffscreen;
+
+        const aspectRatio = windowWidth / windowHeight;
+
+        const aspectRatioFactor = aspectRatio / (16 / 9);
+
+        const docHeight =
+            Math.max(
+                document.body.scrollHeight,
+                document.body.offsetHeight,
+                document.documentElement.scrollHeight,
+                document.documentElement.offsetHeight
+            ) - windowHeight;
+
+        const shapeOffsets = [0.12, -0.15, 0.08];
+        const shapeFactors = [0.5, 0.7, 0.4];
+
+        const scrollCycleFactor = 1.37;
+
+        let normalizedScroll =
+            (scrollPosition / Math.max(1, docHeight)) * scrollCycleFactor;
+
+        let scrollProgress = Math.max(0, normalizedScroll);
+
+        const screenSizeAdjust = Math.max(
+            0.8,
+            Math.min(0.9, 1000 / windowWidth)
+        );
+
+        // より滑らかな動きのために、形状ごとに異なる周期でオフセットを適用
+        const cyclicOffsets = [
+            Math.sin(normalizedScroll * Math.PI * 2) * 0.05,
+            Math.cos(normalizedScroll * Math.PI * 2) * 0.07,
+            Math.sin(normalizedScroll * Math.PI * 3) * 0.03,
+        ];
+
+        scrollProgress = Math.max(
+            0,
+            Math.min(
+                1,
+                (scrollProgress +
+                    shapeOffsets[shapeIndex] +
+                    cyclicOffsets[shapeIndex]) *
+                    shapeFactors[shapeIndex] *
+                    screenSizeAdjust *
+                    aspectRatioFactor
+            )
+        );
+
+        const easedScroll = easeInOutQuartEnhanced(scrollProgress);
+
+        const variationFactor = 1 + Math.max(-0.2, Math.min(0.2, variation));
+
+        const velocityInfluence =
+            scrollVelocity *
+            (shapeIndex === 1 ? -1 : 1) *
+            (isMobile
+                ? params.velocityMultiplier
+                : params.velocityMultiplier * 1.5);
+
+        const screenSizeMovementFactor = Math.min(
+            1.0,
+            Math.max(0.5, windowWidth / 1600)
+        );
+
+        const baseMovement =
+            (params.baseTransform + params.moveRange * easedScroll) *
+            screenSizeMovementFactor;
+
+        const limitedBaseMovement = Math.max(
+            -maxMovementX,
+            Math.min(maxMovementX, baseMovement)
+        );
+
+        const movement = Math.max(
+            -maxMovementX,
+            Math.min(maxMovementX, limitedBaseMovement + velocityInfluence)
+        );
+
+        let baseRotation = params.rotateRange * easedScroll * variationFactor;
+        if (!isMobile) {
+            const frequency = [4, 3, 5][shapeIndex];
+            baseRotation +=
+                Math.sin(
+                    scrollProgress * Math.PI * frequency * variationFactor
+                ) * 30;
+        }
+        const rotation = baseRotation;
+
+        const waveIntensity = isMobile ? 0.7 : 0.8;
+        const waveFrequency = isMobile
+            ? [2, 2.5, 1.8][shapeIndex]
+            : [3, 3.5, 2.8][shapeIndex];
+        const wave =
+            Math.sin(
+                scrollProgress * Math.PI * waveFrequency * variationFactor +
+                    shapeIndex
+            ) * waveIntensity;
+
+        const minScale = isMobile ? 0.8 : 0.9;
+        const maxScale = isMobile ? 1.3 : 1.5;
+        const baseScale =
+            params.baseScale +
+            params.scaleRange * wave * params.waveMultiplier * variationFactor +
+            Math.abs(scrollVelocity) * params.velocityScaleEffect;
+        const scale = Math.max(minScale, Math.min(maxScale, baseScale));
+
+        if (shapeIndex === 0) {
+            const yMovement = movement / 4;
+            const limitedYMovement = Math.max(
+                -maxMovementY,
+                Math.min(maxMovementY, yMovement)
+            );
+
+            return isMobile
+                ? `translateX(${movement}px) rotate(${rotation}deg) scale(${scale})`
+                : `translateX(${movement}px) translateY(${limitedYMovement}px) rotate(${rotation}deg) scale(${scale})`;
+        } else if (shapeIndex === 1) {
+            const yMovement = -movement / 3;
+            const limitedYMovement = Math.max(
+                -maxMovementY,
+                Math.min(maxMovementY, yMovement)
+            );
+
+            return isMobile
+                ? `translateX(${-movement}px) rotate(${-rotation}deg) scale(${scale})`
+                : `translateX(${-movement}px) translateY(${limitedYMovement}px) rotate(${-rotation}deg) scale(${scale})`;
+        } else {
+            const xMovement = movement / 2;
+            const limitedXMovement = Math.max(
+                -maxMovementX,
+                Math.min(maxMovementX, xMovement)
+            );
+
+            const yMovement = isMobile ? -movement : -movement * 1.2;
+            const limitedYMovement = Math.max(
+                -maxMovementY,
+                Math.min(maxMovementY, yMovement)
+            );
+
+            return isMobile
+                ? `translateX(${limitedXMovement}px) translateY(${limitedYMovement}px) rotate(${rotation / 2}deg) scale(${scale})`
+                : `translateX(${limitedXMovement}px) translateY(${limitedYMovement}px) rotate(${rotation / 2}deg) scale(${scale})`;
+        }
+    }
+
+    let lastScrollPosition = window.scrollY;
+    let scrollVelocity = 0;
+    let targetScrollVelocity = 0;
+    let lastTimestamp = performance.now();
+    const velocityFactor = 0.08;
+    const velocitySmoothing = 0.92;
+    let animationFrameId: number | null = null;
+    let isProcessingFrame = false;
+    let needsUpdate = false;
+
+    let scrollVariation = 0;
+    let variationDirection = 1;
+    let shapeRandomFactors = [Math.random(), Math.random(), Math.random()];
+
+    function updateShapesFromScroll(timestamp = performance.now()) {
+        if (isProcessingFrame) {
+            needsUpdate = true;
+            return;
+        }
+
+        isProcessingFrame = true;
+        animationFrameId = null;
+
+        const currentScroll = window.scrollY;
+        const scrollDelta = currentScroll - lastScrollPosition;
+        const deltaTime = timestamp - lastTimestamp;
+
+        targetScrollVelocity =
+            (scrollDelta / Math.max(deltaTime, 16)) * velocityFactor * 1000;
+        scrollVelocity =
+            scrollVelocity * velocitySmoothing +
+            targetScrollVelocity * (1 - velocitySmoothing);
+
+        lastScrollPosition = currentScroll;
+        lastTimestamp = timestamp;
+
+        scrollVariation += (Math.random() * 0.08 - 0.04) * variationDirection;
+
+        shapeRandomFactors = shapeRandomFactors.map(
+            (factor) => factor + (Math.random() * 0.2 - 0.1)
+        );
+
+        if (Math.abs(scrollVariation) > 0.3) {
+            variationDirection *= -1;
+            scrollVariation *= 0.8;
+        }
+
+        const isMobile = !window.matchMedia("(min-width: 815px)").matches;
+        const shapes = document.querySelectorAll(".shape");
+
+        shapes.forEach((shape, index) => {
+            const shapeVariation = scrollVariation * shapeRandomFactors[index];
+
+            const transform = calculateShapeTransform(
+                currentScroll,
+                scrollVelocity,
+                index,
+                isMobile,
+                shapeVariation
+            );
+
+            (shape as HTMLElement).style.transform = transform;
+        });
+
+        isProcessingFrame = false;
+
+        if (needsUpdate) {
+            needsUpdate = false;
+            requestAnimationFrame(updateShapesFromScroll);
+        }
+    }
+
+    function scheduleUpdate() {
+        if (animationFrameId === null) {
+            animationFrameId = requestAnimationFrame(updateShapesFromScroll);
+        } else {
+            needsUpdate = false;
+        }
+    }
+
+    window.addEventListener("scroll", scheduleUpdate);
+    window.addEventListener("resize", scheduleUpdate);
+
+    window.addEventListener("beforeunload", () => {
+        if (animationFrameId !== null) {
+            cancelAnimationFrame(animationFrameId);
+        }
+    });
+
+    function randomizeCirclePositions() {
+        const circles = document.querySelectorAll(".shape");
+        const isMobile = !window.matchMedia("(min-width: 815px)").matches;
+
+        shapeRandomFactors = [Math.random(), Math.random(), Math.random()];
+
+        circles.forEach((circle, index) => {
+            let leftPos, topPos;
+
+            if (index === 0) {
+                leftPos = Math.random() * 25 - 5;
+                topPos = Math.random() * 20 + 15;
+            } else if (index === 1) {
+                leftPos = Math.random() * 25 + 65;
+                topPos = Math.random() * 25 + 30;
+            } else {
+                leftPos = Math.random() * 40 + 30;
+                topPos = Math.random() * 25 + 45;
+            }
+
+            if (isMobile) {
+                leftPos = leftPos * 0.9 + 5;
+                topPos = Math.min(topPos, 80);
+            }
+
+            if (index === 1) {
+                (circle as HTMLElement).style.right = `${100 - leftPos}vw`;
+                (circle as HTMLElement).style.left = "auto";
+            } else {
+                (circle as HTMLElement).style.left = `${leftPos}vw`;
+                (circle as HTMLElement).style.right = "auto";
+            }
+
+            (circle as HTMLElement).style.top = `${topPos}%`;
+        });
+
+        // 初期スクロール位置を少しランダムに設定して、ページロード時から動きを持たせる
+        if (!window.scrollY) {
+            // ランダムな初期スクロール位置を設定（ただし小さい値）
+            const initialScroll = Math.random() * 0.2;
+
+            // 各形状の変形を計算
+            const isMobile = !window.matchMedia("(min-width: 815px)").matches;
+            circles.forEach((circle, index) => {
+                const transform = calculateShapeTransform(
+                    initialScroll * document.body.scrollHeight,
+                    0,
+                    index,
+                    isMobile,
+                    shapeRandomFactors[index] * 0.5
+                );
+
+                (circle as HTMLElement).style.transform = transform;
+            });
+        }
+
+        if (animationFrameId === null) {
+            animationFrameId = requestAnimationFrame(updateShapesFromScroll);
+        }
+    }
+
+    document.addEventListener("astro:page-load", () => {
+        randomizeCirclePositions();
+    });
+</script>
+
+<style>
+    .kawaii-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+        overflow: hidden;
+        animation: feadIn 3s 1 0s forwards ease;
+    }
+
+    @keyframes feadIn {
+        from {
+            opacity: 0;
+            transform: translateY(20dvh);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .shape {
+        position: absolute;
+        border-radius: 50%;
+        background: rgb(var(--blue));
+        transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        will-change: transform, scale, rotate, opacity, filter;
+        backface-visibility: hidden;
+        transform-style: preserve-3d;
+    }
+
+    .circle1 {
+        width: clamp(180px, 25vw, 350px);
+        height: clamp(180px, 25vw, 350px);
+        left: -5vw;
+        top: 20%;
+        background: linear-gradient(
+            45deg,
+            rgb(var(--blue)),
+            rgb(var(--sapphire)),
+            rgb(var(--lavender))
+        );
+        animation: pulse1 15s infinite alternate;
+    }
+
+    .circle2 {
+        width: clamp(150px, 25vw, 300px);
+        height: clamp(150px, 25vw, 300px);
+        right: -8vw;
+        top: 40%;
+        background: linear-gradient(
+            -45deg,
+            rgb(var(--mauve)),
+            rgb(var(--pink)),
+            rgb(var(--rosewater))
+        );
+        animation: pulse2 12s infinite alternate;
+    }
+
+    .circle3 {
+        width: clamp(180px, 28vw, 350px);
+        height: clamp(180px, 28vw, 350px);
+        left: 45%;
+        top: 60%;
+        background: linear-gradient(
+            135deg,
+            rgb(var(--teal)),
+            rgb(var(--sky)),
+            rgb(var(--sapphire))
+        );
+        animation: pulse3 18s infinite alternate;
+    }
+
+    @keyframes pulse1 {
+        0% {
+            opacity: 0.3;
+            filter: blur(0) hue-rotate(0deg);
+        }
+        50% {
+            filter: blur(1px) hue-rotate(45deg);
+        }
+        100% {
+            opacity: 0.15;
+            filter: blur(2px) hue-rotate(90deg);
+        }
+    }
+
+    @keyframes pulse2 {
+        0% {
+            opacity: 0.5;
+            filter: blur(5px) hue-rotate(0deg);
+        }
+        50% {
+            filter: blur(2.5px) hue-rotate(-45deg);
+        }
+        100% {
+            opacity: 0.25;
+            filter: blur(0) hue-rotate(-90deg);
+        }
+    }
+
+    @keyframes pulse3 {
+        0% {
+            opacity: 0.25;
+            filter: blur(0) hue-rotate(0deg);
+        }
+        50% {
+            filter: blur(4px) hue-rotate(22.5deg);
+        }
+        100% {
+            opacity: 0.15;
+            filter: blur(8px) hue-rotate(45deg);
+        }
+    }
+</style>
