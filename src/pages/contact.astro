@@ -218,8 +218,8 @@ async function sendForm(name: string, email: string, msg: string) {
 
                     <div class="turnstile-wrapper">
                         <div class="turnstile-overlay" id="turnstile-loading">
-                            <div class="spinner" />
-                            <p>認証を読み込み中...</p>
+                            <span class="spinner button-spinner " />
+                            <p>認証を読み込み中</p>
                         </div>
                         <div
                             id="turnstile-widget"
@@ -251,28 +251,25 @@ async function sendForm(name: string, email: string, msg: string) {
         hasErrors: Object.values(errors).some((e) => e),
     }}
 >
-    // Turnstileウィジェット用の変数
     let turnstileWidgetId;
 
-    // DOMContentLoadedでTurnstileが利用可能かチェックし、必要なら手動でロード
-    document.addEventListener("DOMContentLoaded", function () {
-        // フォームのSubmit処理にローディング状態を追加
-        setupFormSubmission();
+    document.addEventListener(
+        "astro:page-load",
+        function () {
+            setupFormSubmission();
 
-        // エラーがある場合は最初のエラーフィールドにフォーカス
-        if (hasErrors) {
-            focusFirstErrorField();
-        }
+            if (hasErrors) {
+                focusFirstErrorField();
+            }
 
-        // Turnstileスクリプトが既にロードされているか確認
-        if (typeof turnstile === "undefined") {
-            // Turnstileスクリプトをロード
-            loadTurnstileScript();
-        } else {
-            // 既にロードされている場合は直接レンダリング
-            renderTurnstile();
-        }
-    });
+            if (typeof turnstile === "undefined") {
+                loadTurnstileScript();
+            } else {
+                renderTurnstile();
+            }
+        },
+        { once: true }
+    );
 
     // 最初のエラーフィールドにフォーカスする
     function focusFirstErrorField() {
@@ -290,28 +287,22 @@ async function sendForm(name: string, email: string, msg: string) {
         if (!form) return;
 
         form.addEventListener("submit", function (e) {
-            // フォーム送信前にボタンの状態を確認
             const submitButton = document.getElementById("submit-button");
-
-            // ボタンが無効化されている場合はフォーム送信をキャンセル
             if (submitButton.hasAttribute("disabled")) {
                 e.preventDefault();
                 return false;
             }
 
-            // 送信中の表示に切り替え
             const buttonText = submitButton.querySelector(".button-text");
             const buttonSpinner = submitButton.querySelector(".button-spinner");
 
             buttonText.textContent = "送信中...";
             buttonSpinner.classList.remove("hidden");
 
-            // フォーム送信は継続（ボタンは有効のまま）
             return true;
         });
     }
 
-    // Turnstileスクリプトを動的にロードする関数
     function loadTurnstileScript() {
         const script = document.createElement("script");
         script.src =
@@ -319,51 +310,42 @@ async function sendForm(name: string, email: string, msg: string) {
         script.async = true;
         script.defer = true;
         script.onload = function () {
-            // スクリプトロード完了後にウィジェットをレンダリング
             renderTurnstile();
         };
         document.head.appendChild(script);
     }
 
-    // Turnstileウィジェットをレンダリングする関数
     function renderTurnstile() {
-        // ウィジェットコンテナが存在するか確認
         const widgetContainer = document.getElementById("turnstile-widget");
         if (!widgetContainer) return;
 
-        // turnstileオブジェクトが利用可能か確認
         if (typeof turnstile === "undefined") {
             console.error("Turnstileが読み込まれていません");
             return;
         }
 
-        // 既存のウィジェットがあればリセット
         if (turnstileWidgetId) {
             try {
                 turnstile.reset(turnstileWidgetId);
             } catch (e) {
-                console.log("Turnstileリセット中にエラーが発生しました:", e);
+                console.error("Turnstileにエラーが発生しました");
             }
         }
 
         try {
-            // 新しいウィジェットをレンダリング
             turnstileWidgetId = turnstile.render("#turnstile-widget", {
                 sitekey: siteKey,
                 callback: function (token) {
-                    // トークンが正常に生成されたら送信ボタンを有効化
                     const submitButton =
                         document.getElementById("submit-button");
                     submitButton.removeAttribute("disabled");
                     submitButton.classList.add("active");
 
-                    // ローディングオーバーレイを非表示に
                     document
                         .getElementById("turnstile-loading")
                         .classList.add("loaded");
                 },
                 "expired-callback": function () {
-                    // トークンの期限切れで送信ボタンを無効化
                     document
                         .getElementById("submit-button")
                         .setAttribute("disabled", "");
@@ -372,7 +354,6 @@ async function sendForm(name: string, email: string, msg: string) {
                         .classList.remove("active");
                 },
                 "error-callback": function () {
-                    // エラー時も送信ボタンを無効化
                     document
                         .getElementById("submit-button")
                         .setAttribute("disabled", "");
@@ -383,27 +364,23 @@ async function sendForm(name: string, email: string, msg: string) {
                 },
             });
 
-            // ウィジェットが描画され始めたらローディングオーバーレイを非表示に
             setTimeout(() => {
                 const loadingElement =
                     document.getElementById("turnstile-loading");
                 if (loadingElement) {
                     loadingElement.classList.add("loaded");
                 }
-            }, 1500); // ウィジェットの描画に少し時間を与える
+            }, 1500);
         } catch (e) {
             console.error("Turnstileレンダリング中にエラーが発生しました:", e);
         }
     }
 
-    // グローバル関数としてコールバックを定義（API読み込み時に呼ばれる）
     window.onloadTurnstileCallback = function () {
         renderTurnstile();
     };
 
-    // エラーがある場合は特に確実にTurnstileを初期化
     if (hasErrors) {
-        // 少し遅延させてDOMが完全に読み込まれてからTurnstileを初期化
         setTimeout(function () {
             if (typeof turnstile !== "undefined") {
                 renderTurnstile();
@@ -503,6 +480,29 @@ async function sendForm(name: string, email: string, msg: string) {
     @keyframes spin {
         to {
             transform: rotate(360deg);
+        }
+    }
+
+    .dots span {
+        display: inline-block;
+        animation: bounce 1.2s infinite;
+    }
+
+    .dots span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .dots span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes bounce {
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+        20% {
+            transform: translateY(-0.35em);
         }
     }
 
