@@ -1,9 +1,9 @@
 ---
-import Head from "@/src/components/root/head.astro";
+import Head from "@/src/pages-components/head.astro";
 import Baselayout from "@/src/layouts/baselayout.astro";
 import Footer from "@/src/components/root/footer.astro";
 import Modal from "@/src/components/ui/modal.astro";
-import ThemeToggle from "@/src/components/ui/ThemeToggle.astro";
+import ThemeToggle from "@/src/pages-components/theme-toggle.astro";
 
 import { APPS } from "@/src/const";
 import { APP_NAME } from "@/src/const";
@@ -101,8 +101,8 @@ export const prerender = true;
         padding: 0 5%;
         background-color: rgb(var(--base) / 0.85);
         box-shadow: 0px 2px 15px -5px rgb(var(--mauve) / 0.5);
-        display: flex;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
         align-items: center;
         height: 5rem;
         position: sticky;
@@ -113,6 +113,7 @@ export const prerender = true;
 
     header > h2 {
         margin: 0;
+        justify-self: start;
     }
     header > h2 > a {
         text-decoration: none;
@@ -134,6 +135,8 @@ export const prerender = true;
         background-color: rgb(var(--surface0) / 0.3);
         backdrop-filter: blur(10px);
         transition: all 0.2s ease;
+        grid-column: 2;
+        justify-self: center;
     }
 
     .links:hover {
@@ -211,9 +214,15 @@ export const prerender = true;
         background-color: rgb(var(--mauve) / 0.2);
         color: rgb(var(--mauve));
     }
+
+    .thema-toggle {
+        justify-self: end;
+    }
+
     @media (max-width: 815px) {
         header {
             height: 4rem;
+            display: flex; /* モバイル表示ではflexに戻す */
         }
         header > h2 {
             position: absolute;
