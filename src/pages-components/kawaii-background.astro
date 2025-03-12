@@ -25,15 +25,15 @@
         const params = isMobile
             ? {
                   baseTransform:
-                      shapeIndex === 0 ? -90 : shapeIndex === 1 ? -150 : -160,
-                  moveRange: 350,
-                  rotateRange: 520,
-                  scaleRange: 0.4,
-                  velocityMultiplier: 0.6,
-                  baseScale: 1,
-                  waveMultiplier: 0.5,
-                  velocityScaleEffect: 0.05,
-                  scrollFactor: 0.1,
+                      shapeIndex === 0 ? -120 : shapeIndex === 1 ? -180 : -200,
+                  moveRange: 550,
+                  rotateRange: 800,
+                  scaleRange: 0.8,
+                  velocityMultiplier: 1.2,
+                  baseScale: 1.2,
+                  waveMultiplier: 1.0,
+                  velocityScaleEffect: 0.1,
+                  scrollFactor: 0.2,
               }
             : {
                   baseTransform:
@@ -51,9 +51,11 @@
         const windowHeight = window.innerHeight;
         const windowWidth = window.innerWidth;
 
-        const maxAllowedOffscreen = isMobile ? 20 : 50;
-        const maxMovementX = windowWidth * 0.3 + maxAllowedOffscreen;
-        const maxMovementY = windowHeight * 0.2 + maxAllowedOffscreen;
+        const maxAllowedOffscreen = isMobile ? 50 : 50;
+        const maxMovementX =
+            windowWidth * (isMobile ? 0.5 : 0.3) + maxAllowedOffscreen;
+        const maxMovementY =
+            windowHeight * (isMobile ? 0.4 : 0.2) + maxAllowedOffscreen;
 
         const aspectRatio = windowWidth / windowHeight;
 
