@@ -1,9 +1,9 @@
 ---
-import Head from "@/src/components/root/head.astro";
+import Head from "@/src/pages-components/head.astro";
 import Baselayout from "@/src/layouts/baselayout.astro";
 import Footer from "@/src/components/root/footer.astro";
 import Modal from "@/src/components/ui/modal.astro";
-import ThemeToggle from "@/src/components/ui/ThemeToggle.astro";
+import ThemeToggle from "@/src/pages-components/theme-toggle.astro";
 
 import { APPS } from "@/src/const";
 import { APP_NAME } from "@/src/const";
@@ -49,7 +49,9 @@ export const prerender = true;
 
                             <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; align-content: center;">
                                 <span>ダークモード</span>
-                                <ThemeToggle />
+                                <div class="theme-toggle-mobile">
+                                    <ThemeToggle />
+                                </div>
                             </div>
                         </Modal>
                     )
@@ -82,7 +84,7 @@ export const prerender = true;
                     </nav>
                 )
             }
-            <div class="thema-toggle">
+            <div class="theme-toggle">
                 <ThemeToggle />
             </div>
         </header>
@@ -98,12 +100,12 @@ export const prerender = true;
 <style>
     header {
         margin: 0;
-        padding: 0 5%;
+        padding: 0 2%;
         background-color: rgb(var(--base) / 0.85);
         box-shadow: 0px 2px 15px -5px rgb(var(--mauve) / 0.5);
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        justify-content: space-between;
         height: 5rem;
         position: sticky;
         top: 0;
@@ -113,6 +115,7 @@ export const prerender = true;
 
     header > h2 {
         margin: 0;
+        justify-self: start;
     }
     header > h2 > a {
         text-decoration: none;
@@ -134,6 +137,8 @@ export const prerender = true;
         background-color: rgb(var(--surface0) / 0.3);
         backdrop-filter: blur(10px);
         transition: all 0.2s ease;
+        grid-column: 2;
+        justify-self: center;
     }
 
     .links:hover {
@@ -191,8 +196,7 @@ export const prerender = true;
         transform: translateY(-2px);
         box-shadow: 0px 0px 4px 3px rgb(var(--mauve) / 0.4);
     }
-    /* 現在のページならハイライト */
-    /* ボーダーをグラデーションにして光彩が周囲を回っているような雰囲気にする */
+
     .modal-inner-content[aria-current="page"] {
         box-shadow: 0px 0px 3px 2px rgb(var(--sapphire) / 0.4);
     }
@@ -211,9 +215,15 @@ export const prerender = true;
         background-color: rgb(var(--mauve) / 0.2);
         color: rgb(var(--mauve));
     }
+
+    .theme-toggle {
+        justify-self: end;
+    }
+
     @media (max-width: 815px) {
         header {
             height: 4rem;
+            display: flex;
         }
         header > h2 {
             position: absolute;
@@ -224,7 +234,7 @@ export const prerender = true;
         .mobile-menu {
             display: flex;
         }
-        .thema-toggle {
+        .theme-toggle {
             display: none;
         }
         .links {

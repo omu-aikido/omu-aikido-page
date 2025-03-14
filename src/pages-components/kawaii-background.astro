@@ -28,24 +28,26 @@
                       shapeIndex === 0 ? -120 : shapeIndex === 1 ? -180 : -200,
                   moveRange: 550,
                   rotateRange: 800,
-                  scaleRange: 0.8,
+                  scaleRange: 0.9, // ランダム性を上げるためscaleRangeを大きく
                   velocityMultiplier: 1.2,
-                  baseScale: 1.2,
-                  waveMultiplier: 1.0,
-                  velocityScaleEffect: 0.1,
+                  baseScale: 1.16, // 3%ほど控えめに
+                  waveMultiplier: 1.2, // ランダム性を上げる
+                  velocityScaleEffect: 0.12, // 動きの反応を上げる
                   scrollFactor: 0.2,
+                  randomFactor: 0.15, // 新たにランダム性係数を追加
               }
             : {
                   baseTransform:
                       shapeIndex === 0 ? -150 : shapeIndex === 1 ? -200 : -250,
                   moveRange: 400,
                   rotateRange: 720,
-                  scaleRange: 0.5,
-                  velocityMultiplier: 0.8,
-                  baseScale: 1.2,
-                  waveMultiplier: 0.8,
-                  velocityScaleEffect: 0.08,
+                  scaleRange: 0.6, // ランダム性を上げるためscaleRangeを大きく
+                  velocityMultiplier: 0.85, // 少し反応を高める
+                  baseScale: 1.16, // 3%ほど控えめに
+                  waveMultiplier: 1.0, // ランダム性を上げる
+                  velocityScaleEffect: 0.09, // 動きの反応を上げる
                   scrollFactor: 0.15,
+                  randomFactor: 0.12, // 新たにランダム性係数を追加
               };
 
         const windowHeight = window.innerHeight;
@@ -69,10 +71,10 @@
                 document.documentElement.offsetHeight
             ) - windowHeight;
 
-        const shapeOffsets = [0.12, -0.15, 0.08];
-        const shapeFactors = [0.5, 0.7, 0.4];
+        const shapeOffsets = [0.14, -0.17, 0.1];
+        const shapeFactors = [0.55, 0.75, 0.45];
 
-        const scrollCycleFactor = 1.37;
+        const scrollCycleFactor = 1.4;
 
         let normalizedScroll =
             (scrollPosition / Math.max(1, docHeight)) * scrollCycleFactor;
@@ -84,12 +86,15 @@
             Math.min(0.9, 1000 / windowWidth)
         );
 
-        // より滑らかな動きのために、形状ごとに異なる周期でオフセットを適用
         const cyclicOffsets = [
-            Math.sin(normalizedScroll * Math.PI * 2) * 0.05,
-            Math.cos(normalizedScroll * Math.PI * 2) * 0.07,
-            Math.sin(normalizedScroll * Math.PI * 3) * 0.03,
+            Math.sin(normalizedScroll * Math.PI * 2.1) * 0.06,
+            Math.cos(normalizedScroll * Math.PI * 1.9) * 0.08,
+            Math.sin(normalizedScroll * Math.PI * 3.2) * 0.05,
         ];
+
+        const noiseValue =
+            Math.sin((Date.now() / 100) * (shapeIndex + 1)) *
+            params.randomFactor;
 
         scrollProgress = Math.max(
             0,
@@ -97,7 +102,8 @@
                 1,
                 (scrollProgress +
                     shapeOffsets[shapeIndex] +
-                    cyclicOffsets[shapeIndex]) *
+                    cyclicOffsets[shapeIndex] +
+                    noiseValue) *
                     shapeFactors[shapeIndex] *
                     screenSizeAdjust *
                     aspectRatioFactor
@@ -106,7 +112,7 @@
 
         const easedScroll = easeInOutQuartEnhanced(scrollProgress);
 
-        const variationFactor = 1 + Math.max(-0.2, Math.min(0.2, variation));
+        const variationFactor = 1 + Math.max(-0.25, Math.min(0.25, variation)); // バリエーションの影響を強める
 
         const velocityInfluence =
             scrollVelocity *
@@ -300,14 +306,14 @@
             let leftPos, topPos;
 
             if (index === 0) {
-                leftPos = Math.random() * 25 - 5;
-                topPos = Math.random() * 20 + 15;
+                leftPos = Math.random() * 30 - 8;
+                topPos = Math.random() * 25 + 10;
             } else if (index === 1) {
-                leftPos = Math.random() * 25 + 65;
-                topPos = Math.random() * 25 + 30;
+                leftPos = Math.random() * 30 + 65;
+                topPos = Math.random() * 30 + 25;
             } else {
-                leftPos = Math.random() * 40 + 30;
-                topPos = Math.random() * 25 + 45;
+                leftPos = Math.random() * 45 + 25;
+                topPos = Math.random() * 28 + 42;
             }
 
             if (isMobile) {
@@ -326,10 +332,8 @@
             (circle as HTMLElement).style.top = `${topPos}%`;
         });
 
-        // 初期スクロール位置を少しランダムに設定して、ページロード時から動きを持たせる
         if (!window.scrollY) {
-            // ランダムな初期スクロール位置を設定（ただし小さい値）
-            const initialScroll = Math.random() * 0.2;
+            const initialScroll = Math.random() * 0.3;
 
             // 各形状の変形を計算
             const isMobile = !window.matchMedia("(min-width: 815px)").matches;
@@ -390,8 +394,8 @@
     }
 
     .circle1 {
-        width: clamp(180px, 25vw, 350px);
-        height: clamp(180px, 25vw, 350px);
+        width: clamp(175px, 24vw, 340px);
+        height: clamp(175px, 24vw, 340px);
         left: -5vw;
         top: 20%;
         background: linear-gradient(
@@ -404,8 +408,8 @@
     }
 
     .circle2 {
-        width: clamp(150px, 25vw, 300px);
-        height: clamp(150px, 25vw, 300px);
+        width: clamp(145px, 24vw, 290px); /* 3%ほど小さく */
+        height: clamp(145px, 24vw, 290px);
         right: -8vw;
         top: 40%;
         background: linear-gradient(
@@ -418,8 +422,8 @@
     }
 
     .circle3 {
-        width: clamp(180px, 28vw, 350px);
-        height: clamp(180px, 28vw, 350px);
+        width: clamp(175px, 27vw, 340px); /* 3%ほど小さく */
+        height: clamp(175px, 27vw, 340px);
         left: 45%;
         top: 60%;
         background: linear-gradient(
@@ -433,42 +437,42 @@
 
     @keyframes pulse1 {
         0% {
-            opacity: 0.3;
+            opacity: 0.28; /* 僅かに不透明度を下げる */
             filter: blur(0) hue-rotate(0deg);
         }
         50% {
             filter: blur(1px) hue-rotate(45deg);
         }
         100% {
-            opacity: 0.15;
+            opacity: 0.14; /* 僅かに不透明度を下げる */
             filter: blur(2px) hue-rotate(90deg);
         }
     }
 
     @keyframes pulse2 {
         0% {
-            opacity: 0.5;
+            opacity: 0.48; /* 僅かに不透明度を下げる */
             filter: blur(5px) hue-rotate(0deg);
         }
         50% {
             filter: blur(2.5px) hue-rotate(-45deg);
         }
         100% {
-            opacity: 0.25;
+            opacity: 0.24; /* 僅かに不透明度を下げる */
             filter: blur(0) hue-rotate(-90deg);
         }
     }
 
     @keyframes pulse3 {
         0% {
-            opacity: 0.25;
+            opacity: 0.24; /* 僅かに不透明度を下げる */
             filter: blur(0) hue-rotate(0deg);
         }
         50% {
             filter: blur(4px) hue-rotate(22.5deg);
         }
         100% {
-            opacity: 0.15;
+            opacity: 0.14; /* 僅かに不透明度を下げる */
             filter: blur(8px) hue-rotate(45deg);
         }
     }
