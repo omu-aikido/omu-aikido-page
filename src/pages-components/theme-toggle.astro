@@ -23,20 +23,17 @@ import "@/src/styles/global.css";
             </span>
             <span class="current-theme-text">Auto</span>
         </button>
-        <div class="theme-select" role="menu">
-            <button class="theme-option" data-theme="system" role="menuitem">
-                <span class="option-icon"><Icon icon="code" /></span>
-                <span>Auto</span>
-            </button>
-            <button class="theme-option" data-theme="light" role="menuitem">
-                <span class="option-icon"><Icon icon="sun" /></span>
-                <span>Light</span>
-            </button>
-            <button class="theme-option" data-theme="dark" role="menuitem">
-                <span class="option-icon"><Icon icon="moon-stars" /></span>
-                <span>Dark</span>
-            </button>
-        </div>
+        <select class="theme-select" role="menu">
+            <option class="theme-option" value="system" role="menuitem">
+                Auto
+            </option>
+            <option class="theme-option" value="light" role="menuitem">
+                Light
+            </option>
+            <option class="theme-option" value="dark" role="menuitem">
+                Dark
+            </option>
+        </select>
     </div>
 </theme-toggle>
 
@@ -92,58 +89,16 @@ import "@/src/styles/global.css";
 
     .theme-select {
         position: absolute;
-        top: 100%;
-        right: 0;
-        margin-top: 0.5rem;
-        background-color: rgb(var(--surface0));
-        border: 1px solid rgb(var(--overlay0));
-        border-radius: 1rem;
-        padding: 0.6rem;
-        display: none;
-        flex-direction: column;
-        min-width: 170px;
-        z-index: 10;
-    }
-
-    .theme-select.active {
-        display: flex;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        z-index: 5;
     }
 
     .theme-option {
-        background: none;
-        border: none;
-        padding: 0.8rem;
-        text-align: left;
-        cursor: pointer;
-        border-radius: 0.8rem;
-        color: rgb(var(--text));
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        margin-bottom: 0.3rem;
-        justify-content: flex-start;
-    }
-
-    .theme-option:last-child {
-        margin-bottom: 0;
-    }
-
-    .theme-option:hover {
-        background-color: rgba(var(--overlay0) / 0.4);
-    }
-
-    .theme-option.active {
-        background-color: rgba(var(--overlay1) / 0.4);
-        font-weight: 500;
-    }
-
-    .option-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 1.8rem;
-        height: 1.8rem;
-        scale: 1.4;
         color: rgb(var(--text));
     }
 
@@ -168,8 +123,9 @@ import "@/src/styles/global.css";
             const button = this.querySelector(
                 ".theme-toggle-button"
             )! as HTMLElement;
-            const themeSelect = this.querySelector(".theme-select")!;
-            const themeOptions = this.querySelectorAll(".theme-option");
+            const themeSelect = this.querySelector(
+                ".theme-select"
+            )! as HTMLSelectElement;
             const systemIcon = this.querySelector(".icon.system")!;
             const lightIcon = this.querySelector(".icon.light")!;
             const darkIcon = this.querySelector(".icon.dark")!;
@@ -215,12 +171,7 @@ import "@/src/styles/global.css";
 
                 // 現在のテーマに応じたアイコンを表示
                 if (theme === "system") {
-                    // システムテーマの場合は、実際の明暗に応じたアイコンを表示
-                    if (isDark) {
-                        darkIcon.classList.remove("hidden");
-                    } else {
-                        lightIcon.classList.remove("hidden");
-                    }
+                    systemIcon.classList.remove("hidden");
                 } else if (theme === "light") {
                     lightIcon.classList.remove("hidden");
                 } else if (theme === "dark") {
@@ -242,37 +193,27 @@ import "@/src/styles/global.css";
                 // テーマ名のテキストを更新
                 themeText.textContent = themeNames[theme];
 
+                // selectの値を更新
+                themeSelect.value = theme;
+
                 // アイコン表示を更新
                 updateThemeIcons(theme, isDark);
-
-                themeOptions.forEach((option) => {
-                    option.classList.toggle(
-                        "active",
-                        option.getAttribute("data-theme") === theme
-                    );
-                });
             };
 
             // 初期テーマの適用
             const currentTheme = getThemePreference();
             applyTheme(currentTheme);
 
-            // ボタンクリックでメニュー開閉
-            button.addEventListener("click", () => {
-                themeSelect.classList.toggle("active");
-            });
+            // ボタンのイベントは不要になった - selectが上に重なっているため
 
             // テーマ選択
-            themeOptions.forEach((option) => {
-                option.addEventListener("click", () => {
-                    const selectedTheme = option.getAttribute("data-theme") as
-                        | "system"
-                        | "light"
-                        | "dark";
-                    saveThemePreference(selectedTheme);
-                    applyTheme(selectedTheme);
-                    themeSelect.classList.remove("active");
-                });
+            themeSelect.addEventListener("change", () => {
+                const selectedTheme = themeSelect.value as
+                    | "system"
+                    | "light"
+                    | "dark";
+                saveThemePreference(selectedTheme);
+                applyTheme(selectedTheme);
             });
 
             // システムテーマ変更の検出
@@ -283,13 +224,6 @@ import "@/src/styles/global.css";
                         applyTheme("system");
                     }
                 });
-
-            // 外部クリックでドロップダウンを閉じる
-            document.addEventListener("click", (e) => {
-                if (!this.contains(e.target as Node)) {
-                    themeSelect.classList.remove("active");
-                }
-            });
         }
     }
     customElements.define("theme-toggle", ThemeToggle);
