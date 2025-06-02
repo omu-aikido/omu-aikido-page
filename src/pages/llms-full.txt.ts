@@ -146,7 +146,7 @@ async function collectFiles(
 
 export const GET: APIRoute = async () => {
     const projectRoot = process.cwd();
-    const srcDir = path.join(projectRoot, "src");
+    const srcDir = path.join(projectRoot, "src/pages");
 
     try {
         // ファイルパスのリストを取得
