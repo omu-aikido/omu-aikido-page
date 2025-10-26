@@ -1,0 +1,615 @@
+---
+import Layout from "@/src/layouts/Layout.astro"
+export const prerender = false
+const TURNSTILE_SITE_KEY = import.meta.env.TURNSTILE_SITE_KEY
+const TURNSTILE_SECRET_KEY = import.meta.env.TURNSTILE_SECRET_KEY
+let errors = {
+  name: "",
+  email: "",
+  msg: "",
+  turnstile: "",
+}
+let submitted = false
+let submitSuccess = false
+let errorMessage = ""
+// Store form values to repopulate on validation failure
+let formValues = {
+  name: "",
+  email: "",
+  msg: "",
+  turnstileRes: null as FormDataEntryValue | null,
+}
+if (Astro.request.method === "POST") {
+  try {
+    const data = await Astro.request.formData()
+    const name = data.get("name")
+    formValues.name = typeof name === "string" ? name : ""
+    if (typeof name !== "string" || name.trim() === "") {
+      errors.name = "名前は必須です。"
+    }
+    const email = data.get("email")
+    formValues.email = typeof email === "string" ? email : ""
+    if (typeof email !== "string" || email.trim() === "") {
+      errors.email = "メールアドレスは必須です。"
+    } else if (true) {
+      errors.email = "有効なメールアドレスを入力してください。"
+    }
+    const msg = data.get("msg")
+    formValues.msg = typeof msg === "string" ? msg : ""
+    if (typeof msg !== "string" || msg.trim() === "") {
+      errors.msg = "お問い合わせ内容は必須です。"
+    } else if (!msg.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/)) {
+      errors.msg =
+        "スパム防止のため、必ず日本語を含む文章を入力するようお願い致します。"
+    }
+
+    // Turnstileトークンの検証
+    formValues.turnstileRes = data.get("cf-turnstile-response")
+    if (!formValues.turnstileRes) {
+      errors.turnstile = "ロボットでないことを確認してください。"
+    } else {
+      // Turnstileトークンをサーバーサイドで検証
+      const formData = new FormData()
+      formData.append("secret", TURNSTILE_SECRET_KEY)
+      formData.append("response", formValues.turnstileRes.toString())
+      formData.append(
+        "remoteip",
+        Astro.request.headers.get("CF-Connecting-IP") || ""
+      )
+
+      const turnstileResult = await fetch(
+        "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+        {
+          method: "POST",
+          body: formData,
+        }
+      )
+
+      const outcome = (await turnstileResult.json()) as {
+        success: boolean
+        "error-codes": string[]
+        challenge_ts: string
+        hostname: string
+      }
+
+      if (!outcome.success) {
+        errors.turnstile = "認証に失敗しました。もう一度お試しください。"
+      }
+    }
+
+    const hasErrors = Object.values(errors).some((msg) => msg)
+    if (!hasErrors) {
+      // ここで実際にメール送信処理を実行
+      const response = await sendForm(
+        name as string,
+        email as string,
+        msg as string
+      )
+      submitted = true
+      if (response.status === 200) {
+        submitSuccess = true
+      } else {
+        errorMessage = await response.text()
+      }
+    }
+  } catch (e) {
+    submitted = true
+    submitSuccess = false
+    if (e instanceof Error) {
+      errorMessage =
+        "送信処理中にエラーが発生しました。後ほど再度お試しください。"
+    }
+  }
+}
+
+async function sendForm(name: string, email: string, msg: string) {
+  try {
+    const googleFormUrl =
+      "https://docs.google.com/forms/d/e/1FAIpQLSchtw1jUUb-myThkbJWbDBnRqXXuKHVhFwQ8RMNS9iZ8vUt7Q/formResponse"
+    const googleFormData = new FormData()
+    googleFormData.append("entry.1687999543", name) // nameフィールド用のエントリーID
+    googleFormData.append("entry.943302473", email) // emailフィールド用のエントリーID
+    googleFormData.append("entry.1694948814", msg) // messageフィールド用のエントリーID
+    const response = await fetch(googleFormUrl, {
+      method: "POST",
+      body: googleFormData,
+    })
+    if (response.ok) {
+      return new Response("送信が完了しました。", { status: 200 })
+    } else {
+      console.error(await response.text())
+      return new Response("送信に失敗しました。", { status: 500 })
+    }
+  } catch (e) {
+    console.error(e)
+    return new Response("送信に失敗しました。", { status: 500 })
+  }
+}
+---
+
+<Layout title="お問い合わせ" description="お問い合わせフォーム">
+  <div class="contact-form">
+    <h1>お問い合わせフォーム</h1>
+    <p>
+      お問い合わせ内容をご記入の上、送信ボタンを押してください。折り返しメールにてご連絡いたします。
+    </p>
+
+    {
+      submitted && submitSuccess ? (
+        <div class="success-message">
+          <h3>送信完了</h3>
+          <p>
+            お問い合わせいただきありがとうございます。確認メールをお送りしましたのでご確認ください。
+          </p>
+          <p>内容を確認次第、担当者からご連絡いたします。</p>
+        </div>
+      ) : submitted && !submitSuccess ? (
+        <div class="error-message">
+          <h3>送信エラー</h3>
+          <p>
+            {errorMessage ||
+              "送信に失敗しました。時間をおいて再度お試しください。"}
+          </p>
+          <button onclick="window.location.reload()">再試行する</button>
+        </div>
+      ) : (
+        <form method="POST" id="contact-form">
+          <label for="name">
+            お名前
+            <span class="required-mark">*</span>
+          </label>
+          <input
+            id="name"
+            type="text"
+            name="name"
+            placeholder="山田太郎"
+            value={formValues.name}
+            class={errors.name ? "error-input" : ""}
+            required
+          />
+          {errors.name && <p class="error field-error">{errors.name}</p>}
+
+          <label for="email">
+            メールアドレス
+            <span class="required-mark">*</span>
+          </label>
+          <input
+            id="email"
+            type="email"
+            name="email"
+            placeholder="example@mail.co.jp"
+            value={formValues.email}
+            class={errors.email ? "error-input" : ""}
+            required
+          />
+          {errors.email && <p class="error field-error">{errors.email}</p>}
+
+          <label for="msg">
+            お問い合わせ内容
+            <span class="required-mark">*</span>
+          </label>
+          <textarea
+            id="msg"
+            name="msg"
+            placeholder="お気軽にお問い合わせください。"
+            value={formValues.msg}
+            class={errors.msg ? "error-input" : ""}
+            required
+          />
+          {errors.msg && <p class="error field-error">{errors.msg}</p>}
+
+          <div class="turnstile-wrapper">
+            <div class="turnstile-overlay" id="turnstile-loading">
+              <span class="spinner button-spinner" />
+              <p>認証を読み込み中</p>
+            </div>
+            <div id="turnstile-widget" class="turnstile-container" />
+          </div>
+          {errors.turnstile && (
+            <p class="error field-error">{errors.turnstile}</p>
+          )}
+
+          <button id="submit-button" type="submit" disabled>
+            <span class="button-text">送信</span>
+            <span class="spinner button-spinner hidden" />
+          </button>
+        </form>
+      )
+    }
+  </div>
+
+  <hr />
+
+  <p>弊部へのご連絡はSNS/メールアドレスからも可能です。</p>
+  <a href="/social">SNS/メールアドレス一覧</a>
+</Layout>
+
+<script
+  define:vars={{
+    siteKey: TURNSTILE_SITE_KEY,
+    hasErrors: Object.values(errors).some((e) => e),
+  }}
+>
+  let turnstileWidgetId
+
+  document.addEventListener(
+    "astro:page-load",
+    function () {
+      setupFormSubmission()
+
+      if (hasErrors) {
+        focusFirstErrorField()
+      }
+
+      if (typeof turnstile === "undefined") {
+        loadTurnstileScript()
+      } else {
+        renderTurnstile()
+      }
+    },
+    { once: true }
+  )
+
+  // 最初のエラーフィールドにフォーカスする
+  function focusFirstErrorField() {
+    setTimeout(() => {
+      const errorFields = document.querySelectorAll(".error-input")
+      if (errorFields.length > 0) {
+        errorFields[0].focus()
+      }
+    }, 100)
+  }
+
+  // フォーム送信時の処理を設定
+  function setupFormSubmission() {
+    const form = document.getElementById("contact-form")
+    if (!form) return
+
+    form.addEventListener("submit", function (e) {
+      const submitButton = document.getElementById("submit-button")
+      if (submitButton.hasAttribute("disabled")) {
+        e.preventDefault()
+        return false
+      }
+
+      const buttonText = submitButton.querySelector(".button-text")
+      const buttonSpinner = submitButton.querySelector(".button-spinner")
+
+      buttonText.textContent = "送信中..."
+      buttonSpinner.classList.remove("hidden")
+
+      return true
+    })
+  }
+
+  function loadTurnstileScript() {
+    const script = document.createElement("script")
+    script.src =
+      "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+    script.async = true
+    script.defer = true
+    script.onload = function () {
+      renderTurnstile()
+    }
+    document.head.appendChild(script)
+  }
+
+  function renderTurnstile() {
+    const widgetContainer = document.getElementById("turnstile-widget")
+    if (!widgetContainer) return
+
+    if (typeof turnstile === "undefined") {
+      console.error("Turnstileが読み込まれていません")
+      return
+    }
+
+    if (turnstileWidgetId) {
+      try {
+        turnstile.reset(turnstileWidgetId)
+      } catch (e) {
+        console.error("Turnstileにエラーが発生しました")
+      }
+    }
+
+    try {
+      turnstileWidgetId = turnstile.render("#turnstile-widget", {
+        sitekey: siteKey,
+        callback: function (token) {
+          const submitButton = document.getElementById("submit-button")
+          submitButton.removeAttribute("disabled")
+          submitButton.classList.add("active")
+
+          document.getElementById("turnstile-loading").classList.add("loaded")
+        },
+        "expired-callback": function () {
+          document.getElementById("submit-button").setAttribute("disabled", "")
+          document.getElementById("submit-button").classList.remove("active")
+        },
+        "error-callback": function () {
+          document.getElementById("submit-button").setAttribute("disabled", "")
+          document.getElementById("submit-button").classList.remove("active")
+          console.error("Turnstile検証中にエラーが発生しました")
+        },
+      })
+
+      setTimeout(() => {
+        const loadingElement = document.getElementById("turnstile-loading")
+        if (loadingElement) {
+          loadingElement.classList.add("loaded")
+        }
+      }, 1500)
+    } catch (e) {
+      console.error("Turnstileレンダリング中にエラーが発生しました:", e)
+    }
+  }
+
+  window.onloadTurnstileCallback = function () {
+    renderTurnstile()
+  }
+
+  if (hasErrors) {
+    setTimeout(function () {
+      if (typeof turnstile !== "undefined") {
+        renderTurnstile()
+      } else {
+        loadTurnstileScript()
+      }
+    }, 500)
+  }
+</script>
+
+<style>
+  .error {
+    color: rgb(var(--red));
+  }
+  .field-error {
+    font-size: 0.85rem;
+    margin: 0.25rem 0 0.5rem 0;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .error-input {
+    border: 2px solid rgb(var(--red)) !important;
+    background-color: rgba(var(--red), 0.05);
+  }
+
+  .turnstile-wrapper {
+    position: relative;
+    min-height: 65px;
+    margin: 1rem 0;
+  }
+
+  .turnstile-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(var(--base));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    transition:
+      opacity 0.3s ease,
+      visibility 0.3s;
+    border-radius: 0.5rem;
+  }
+
+  .turnstile-overlay.loaded {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .turnstile-overlay p {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: rgb(var(--text));
+  }
+
+  .spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(var(--text), 0.3);
+    border-radius: 50%;
+    border-top-color: rgb(var(--text));
+    animation: spin 1s linear infinite;
+  }
+
+  .button-spinner {
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 8px;
+    border: 2px solid rgb(var(--overlay0));
+    border-radius: 50%;
+    border-top-color: rgb(var(--base));
+    animation: spin 1s linear infinite;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .dots span {
+    display: inline-block;
+    animation: bounce 1.2s infinite;
+  }
+
+  .dots span:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  .dots span:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+
+  @keyframes bounce {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    20% {
+      transform: translateY(-0.35em);
+    }
+  }
+
+  #submit-button {
+    background-color: rgb(var(--teal));
+    color: rgb(var(--base));
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #submit-button:not([disabled]):hover,
+  #submit-button.active:hover {
+    background-color: rgb(var(--sky));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  #submit-button[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  #submit-button.active {
+    opacity: 1;
+    cursor: pointer;
+    background-color: rgb(var(--teal));
+  }
+
+  input,
+  textarea {
+    transition: all 0.3s ease;
+    border: 2px solid rgb(var(--border));
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    background-color: rgb(var(--surface0));
+    color: rgb(var(--text));
+  }
+
+  input:focus,
+  textarea:focus {
+    outline: none;
+    border-color: rgb(var(--primary-500));
+    box-shadow: 0 0 0 3px rgba(var(--primary-500), 0.15);
+  }
+
+  @media (max-width: 768px) {
+    form,
+    #contact-form {
+      margin: 0 1rem;
+    }
+    input,
+    textarea,
+    #submit-button {
+      padding: 0.85rem;
+    }
+  }
+
+  .success-message {
+    background-color: rgba(var(--green), 0.1);
+    border: 1px solid rgb(var(--green));
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .error-message {
+    background-color: rgba(var(--red), 0.1);
+    border: 1px solid rgb(var(--red));
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  button {
+    cursor: pointer;
+  }
+  #turnstile-widget {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .turnstile-container {
+    margin: 1rem 0;
+    height: 60px;
+  }
+  button[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .contact-container {
+    max-width: 64rem;
+    margin: 0 auto;
+  }
+
+  .required-mark {
+    color: rgb(var(--red));
+    font-size: 0.8rem;
+  }
+
+  section {
+    margin-bottom: 4rem;
+  }
+
+  h2 {
+    border-bottom: 3px solid var(--surface0);
+  }
+
+  h4 {
+    padding-bottom: 0.75rem;
+    color: rgb(var(--text));
+    letter-spacing: 0.05em;
+  }
+
+  .contact-container p {
+    font-size: 1rem;
+    opacity: 0.9;
+    color: rgb(var(--subtext0));
+    transition: color 0.3s ease;
+  }
+
+  form {
+    display: grid;
+    gap: 1rem;
+    margin: 0 10%;
+  }
+
+  textarea {
+    height: 10rem;
+    background-color: rgb(var(--surface0));
+    border: 2px solid rgb(var(--border));
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    resize: none;
+    transition: all 0.3s ease;
+    color: rgb(var(--text));
+  }
+</style>

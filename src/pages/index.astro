@@ -1,0 +1,144 @@
+---
+import Layout from "@/src/layouts/Layout.astro"
+import { Image } from "astro:assets"
+import NavCard from "@/src/components/ui/navcard.astro"
+import aikidoImage from "@/src/assets/84DABC3E-78F6-4FAC-B2EB-F98F5DDDFC15.webp"
+---
+
+<Layout title="トップ" description="大阪公立大学合氣道部">
+  <!-- ヒーローセクション -->
+  <section
+    class="my-8 rounded-lg bg-linear-to-b from-neutral-50 to-neutral-100 px-6 py-16 dark:from-neutral-900 dark:to-neutral-800"
+  >
+    <div class="text-center">
+      <h1
+        class="mb-6 text-4xl font-bold text-neutral-900 md:text-6xl dark:text-neutral-100"
+      >
+        大阪公立大学合氣道部
+      </h1>
+      <p
+        class="mx-auto mb-8 max-w-3xl text-lg text-neutral-700 md:text-xl dark:text-neutral-300"
+      >
+        大阪公立大学合気道部は、大阪公立大学中百舌鳥キャンパス、杉本キャンパスで活動する、体育会所属の合気道団体です。
+      </p>
+      <a
+        href="/about"
+        class="inline-block rounded-lg bg-emerald-600 px-8 py-3 font-semibold text-white transition-colors duration-200 hover:bg-emerald-700"
+      >
+        もっと知る
+      </a>
+    </div>
+  </section>
+
+  <section class="my-16 px-6">
+    <div class="mb-8 flex items-center justify-between">
+      <a
+        href="/about/aikido"
+        class="font-semibold text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+      >
+        <h2 class="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+          合気道を知る
+        </h2>
+      </a>
+    </div>
+    <div class="rounded-lg bg-white p-8 shadow-md dark:bg-neutral-700">
+      <div class="grid items-center gap-8 md:grid-cols-2">
+        <div
+          class="[&_p]:mb-4 [&_p]:text-neutral-600 [&_p]:dark:text-neutral-300"
+        >
+          <h3
+            class="mb-4 text-2xl font-semibold text-neutral-900 dark:text-neutral-100"
+          >
+            合気道とは
+          </h3>
+          <p>
+            合気道は、開祖・植芝盛平翁が創始した現代武道です。<br
+            />相手と強弱を競わず、入身と転換の体捌きと呼吸力から生まれる技によって心身の錬成を図ります。
+          </p>
+          <p>
+            試合や競技は行わず、お互いに切磋琢磨し合って稽古を積み重ねることを目的としています。
+          </p>
+          <a
+            href="/about/aikido"
+            class="inline-block rounded-lg bg-emerald-600 px-6 py-2 font-semibold text-white transition-colors duration-200 hover:bg-emerald-700"
+          >
+            もっと詳しく
+          </a>
+        </div>
+        <div class="text-center">
+          <Image
+            src={aikidoImage}
+            alt="座技呼吸法を指導する様子"
+            class="mx-auto flex h-56 w-56 items-center justify-center rounded-full bg-neutral-200 dark:bg-neutral-600"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="my-16 px-6">
+    <h2
+      class="mb-8 text-center text-3xl font-bold text-neutral-900 dark:text-neutral-100"
+    >
+      サイト案内
+    </h2>
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <NavCard
+        title="活動場所"
+        icon="map-pin"
+        ,
+        desc="稽古場所へのアクセス"
+        link="access"
+      />
+      <NavCard
+        title="活動予定"
+        icon="calendar"
+        ,
+        desc="活動予定の確認"
+        link="calendar"
+      />
+      <NavCard
+        title="応援する"
+        icon="heart"
+        ,
+        desc="合氣道部を応援しませんか？"
+        link="support"
+      />
+      <NavCard
+        title="リンク集"
+        icon="link"
+        ,
+        desc="関連団体サイトへのリンク"
+        link="links"
+      />
+    </div>
+
+    {
+      /*
+
+    <section class="my-16 px-6">
+      <div
+        class="rounded-lg bg-linear-to-r from-emerald-50 to-emerald-100 p-8 text-center dark:from-emerald-900/20 dark:to-emerald-800/20"
+      >
+        <h2
+          class="mb-4 text-3xl font-bold text-neutral-900 dark:text-neutral-100"
+        >
+          お気軽にお問い合わせください
+        </h2>
+        <p
+          class="mx-auto mb-8 max-w-2xl text-lg text-neutral-700 dark:text-neutral-300"
+        >
+          見学・体験・入部に関するご質問など、お待ちしています
+        </p>
+        <a
+          href="/contact"
+          class="inline-block rounded-lg bg-emerald-600 px-8 py-3 font-semibold text-white transition-colors duration-200 hover:bg-emerald-700"
+        >
+          お問い合わせ
+        </a>
+      </div>
+    </section>
+    */
+    }
+  </section>
+</Layout>

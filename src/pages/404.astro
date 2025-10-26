@@ -1,0 +1,108 @@
+---
+import Layout from "@/src/layouts/Layout.astro"
+import NavCard from "@/src/components/ui/navcard.astro"
+import Icon from "@/src/components/root/icon.astro"
+---
+
+<Layout title="404 Not Found" description="指定されたページが見つかりません">
+  <!-- 404エラーヒーローセクション -->
+  <section
+    class="my-8 rounded-lg bg-linear-to-b from-neutral-50 to-neutral-100 px-6 py-16 text-center dark:from-neutral-900 dark:to-neutral-800"
+  >
+    <div
+      class="mx-auto flex h-32 w-32 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30"
+    >
+      <Icon
+        icon="code"
+        size="20"
+        class="text-emerald-600 dark:text-emerald-400"
+      />
+    </div>
+    <h1
+      class="mt-8 mb-4 text-6xl font-bold text-neutral-900 md:text-8xl dark:text-neutral-100"
+    >
+      404
+    </h1>
+    <h2
+      class="mb-4 text-2xl font-semibold text-neutral-800 md:text-3xl dark:text-neutral-200"
+    >
+      ページが見つかりません {`(;>_<;)`}
+    </h2>
+    <p
+      class="mx-auto mb-8 max-w-2xl text-lg text-neutral-600 dark:text-neutral-400"
+    >
+      申し訳ございません。お探しのページは存在しないか、移動または削除された可能性があります。
+    </p>
+    <a
+      href="/"
+      class="inline-block rounded-lg bg-emerald-600 px-8 py-3 font-semibold text-white transition-colors duration-200 hover:bg-emerald-700"
+    >
+      ホームに戻る
+    </a>
+  </section>
+
+  <!-- ナビゲーション案内セクション -->
+  <section class="my-16 px-6">
+    <h3
+      class="mb-6 text-center text-2xl font-semibold text-neutral-900 dark:text-neutral-100"
+    >
+      こちらのページはいかがでしょうか？
+    </h3>
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <NavCard
+        title="部について"
+        icon="list"
+        desc="合氣道部の紹介"
+        link="/about"
+      />
+      <NavCard
+        title="活動場所"
+        icon="map-pin"
+        desc="稽古場所へのアクセス"
+        link="/access"
+      />
+      <NavCard
+        title="活動予定"
+        icon="calendar"
+        desc="活動予定の確認"
+        link="/calendar"
+      />
+      <NavCard
+        title="応援する"
+        icon="heart"
+        desc="合氣道部を応援しませんか？"
+        link="/support"
+      />
+    </div>
+  </section>
+
+  <!-- お困りの場合のセクション -->
+  <section class="my-16 px-6">
+    <div
+      class="rounded-lg bg-linear-to-r from-emerald-50 to-emerald-100 p-8 text-center dark:from-emerald-900/20 dark:to-emerald-800/20"
+    >
+      <h3
+        class="mb-4 text-xl font-semibold text-neutral-900 dark:text-neutral-100"
+      >
+        お探しの情報が見つからない場合
+      </h3>
+      <p class="mx-auto mb-6 max-w-xl text-neutral-700 dark:text-neutral-300">
+        サイトの問題や、お探しの情報についてご質問がございましたら、お気軽にお問い合わせください。
+      </p>
+      <div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <a
+          href="/"
+          class="inline-block rounded-lg bg-emerald-600 px-6 py-2 font-semibold text-white transition-colors duration-200 hover:bg-emerald-700"
+        >
+          トップページへ
+        </a>
+        <a
+          href="/about"
+          class="inline-block rounded-lg border-2 border-emerald-600 px-6 py-2 font-semibold text-emerald-600 transition-colors duration-200 hover:bg-emerald-600 hover:text-white dark:border-emerald-400 dark:text-emerald-400 dark:hover:bg-emerald-400 dark:hover:text-neutral-900"
+        >
+          部について見る
+        </a>
+      </div>
+    </div>
+  </section>
+</Layout>
