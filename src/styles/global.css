@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+@layer base {
+  hr {
+    @apply mt-6 mb-3 w-full border-t;
+  }
+}

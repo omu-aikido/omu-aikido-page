@@ -1,0 +1,24 @@
+---
+import Footer from "@/src/components/root/footer.astro"
+import Head from "@/src/components/root/head.astro"
+import Header from "@/src/components/root/header.astro"
+import "../styles/global.css"
+
+interface Props {
+  title: string
+  description: string
+}
+
+const { title, description } = Astro.props
+---
+
+<html lang="ja">
+  <Head title={title} description={description} />
+  <body class="mx-auto bg-neutral-100 dark:bg-neutral-800">
+    <Header />
+    <main class="mx-auto min-h-[75dvh] sm:max-w-3xl lg:max-w-6xl">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

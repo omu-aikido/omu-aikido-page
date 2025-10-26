@@ -1,0 +1,40 @@
+---
+import Icon from "@/src/components/root/icon.astro"
+import { iconPaths } from "@/src/components/root/iconPaths"
+
+interface Props {
+  icon: keyof typeof iconPaths
+  title: string
+  desc: string
+  link: string
+}
+
+const { icon, title, desc, link } = Astro.props
+---
+
+<div
+  class="rounded-lg bg-white p-6 text-center shadow-md transition-shadow duration-200 hover:shadow-lg dark:bg-neutral-700"
+>
+  <a
+    href={link}
+    class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full"
+  >
+    <Icon
+      icon={icon}
+      size="13"
+      class="text-emerald-600 dark:text-emerald-400"
+    />
+  </a>
+  <h3 class="mb-2 text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+    {title}
+  </h3>
+  <p class="mb-4 text-sm text-neutral-600 dark:text-neutral-300">
+    {desc}
+  </p>
+  <a
+    href={link}
+    class="font-semibold text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+  >
+    詳しく見る
+  </a>
+</div>

@@ -1,0 +1,25 @@
+---
+interface Props {
+  title: string
+  description: string
+}
+---
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width" />
+  <meta name="generator" content={Astro.generator} />
+  <meta name="description" content={Astro.props.description} />
+  <link rel="sitemap" href="/sitemap-index.xml" />
+  <link rel="canonical" href="https://omu-aikido.com" />
+  <link
+    rel="apple-touch-icon"
+    type="image/png"
+    href="/apple-touch-icon-180x180.png"
+  />
+  <link rel="icon" type="image/png" href="/icon-192x192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512x512.png" />
+  <title>
+    {Astro.props.title} | 大阪公立大学合氣道部
+  </title>
+</head>

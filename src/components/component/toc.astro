@@ -1,0 +1,38 @@
+---
+interface Props {
+  toc: Array<{
+    text: string
+    slug: string
+    children: Array<{ text: string; slug: string }>
+  }>
+}
+const { toc } = Astro.props
+---
+
+<div
+  class="flex-col rounded-md border border-slate-300 bg-slate-200/20 p-4 dark:border-stone-700 dark:bg-neutral-800"
+>
+  <span class="text-lg text-neutral-600 dark:text-neutral-400">目次</span>
+  <ol class="ml-6 list-decimal">
+    {
+      toc.map((item) => (
+        <li class="mb-1 text-sm text-neutral-600 dark:text-neutral-400">
+          <a href={`#${item.slug}`} class="hover:underline">
+            {item.text}
+          </a>
+          {item.children && item.children.length > 0 && (
+            <ol class="mt-1 ml-4 list-decimal text-neutral-600 dark:text-neutral-400">
+              {item.children.map((child) => (
+                <li class="mb-1 text-sm text-neutral-600 dark:text-neutral-400">
+                  <a href={`#${child.slug}`} class="hover:underline">
+                    {child.text}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</div>
