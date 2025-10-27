@@ -6,9 +6,8 @@ import aikidoImage from "@/src/assets/84DABC3E-78F6-4FAC-B2EB-F98F5DDDFC15.webp"
 ---
 
 <Layout title="トップ" description="大阪公立大学合氣道部">
-  <!-- ヒーローセクション -->
   <section
-    class="my-8 rounded-lg bg-linear-to-b from-neutral-50 to-neutral-100 px-6 py-16 dark:from-neutral-900 dark:to-neutral-800"
+    class="my-8 px-6 py-16"
   >
     <div class="text-center">
       <h1
@@ -28,6 +27,27 @@ import aikidoImage from "@/src/assets/84DABC3E-78F6-4FAC-B2EB-F98F5DDDFC15.webp"
         もっと知る
       </a>
     </div>
+    <div class="absolute inset-0 -z-10 pointer-events-none" aria-hidden="true">
+      <div class="absolute inset-0 rounded-lg bg-linear-to-b from-emerald-50/60 to-transparent dark:from-emerald-900/30"></div>
+      <div class="absolute left-1/2 top-1/2 w-7xl -translate-x-1/2 -translate-y-1/2 blur-3xl opacity-30 dark:opacity-20">
+        <svg viewBox="0 0 800 400" class="w-full h-auto" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+          <defs>
+            <radialGradient id="g1" cx="30%" cy="40%" r="50%">
+              <stop offset="0%" stop-color="#34d399" stop-opacity="0.45"/>
+              <stop offset="60%" stop-color="#34d399" stop-opacity="0.18"/>
+              <stop offset="100%" stop-color="#34d399" stop-opacity="0"/>
+            </radialGradient>
+            <radialGradient id="g2" cx="80%" cy="60%" r="50%">
+              <stop offset="0%" stop-color="#10b981" stop-opacity="0.35"/>
+              <stop offset="60%" stop-color="#10b981" stop-opacity="0.12"/>
+              <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <rect width="800" height="400" fill="url(#g1)"/>
+          <rect width="800" height="400" fill="url(#g2)"/>
+        </svg>
+      </div>
+    </div>
   </section>
 
   <section class="my-16 px-6">
@@ -41,7 +61,7 @@ import aikidoImage from "@/src/assets/84DABC3E-78F6-4FAC-B2EB-F98F5DDDFC15.webp"
         </h2>
       </a>
     </div>
-    <div class="rounded-lg bg-white p-8 shadow-md dark:bg-neutral-700">
+    <div class="rounded-lg bg-white/70 p-8 shadow-md dark:bg-neutral-700/70 backdrop-blur-md">
       <div class="grid items-center gap-8 md:grid-cols-2">
         <div
           class="[&_p]:mb-4 [&_p]:text-neutral-600 [&_p]:dark:text-neutral-300"

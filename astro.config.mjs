@@ -21,7 +21,7 @@ export default defineConfig({
     imageService: "passthrough",
   }),
 
-  site: "https://omu-aikido.com",
+  site: import.meta.env.PROD ? "https://omu-aikido.com" : "http://localhost:4321",
 
   vite: {
     plugins: [tailwindcss()],
