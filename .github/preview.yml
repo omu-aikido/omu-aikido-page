@@ -5,8 +5,9 @@ permissions:
 
 on:
   push:
-    branches:
+    branches-ignore:
       - "main"
+  workflow_dispatch:
 
 jobs:
   deploy-production:
@@ -41,4 +42,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: |
-            pages deploy dist --project-name=omu-aikido-page
+            pages deploy dist --project-name=omu-aikido-page --branch=preview
