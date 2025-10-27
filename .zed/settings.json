@@ -22,5 +22,6 @@
       "args": ["-y", "mcp-remote", "https://mcp.docs.astro.build/mcp"]
     }
   },
+  "format_on_save": "off",
   "language_servers": ["!markdown-oxide", "..."]
 }
