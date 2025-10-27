@@ -38,9 +38,16 @@ export default function CalendarView({
         if (!cancelled) {
           setEvents(Array.isArray(data) ? data : [])
         }
-      } catch (err: any) {
-        if (!cancelled && err.name !== "AbortError") {
-          setError(err?.message ?? "稽古予定の読み込みに失敗しました")
+      } catch (err: unknown) {
+        if (
+          !cancelled &&
+          !(err instanceof Error && err.name === "AbortError")
+        ) {
+          if (err instanceof Error) {
+            setError(err.message)
+          } else {
+            setError("稽古予定の読み込みに失敗しました")
+          }
           setEvents([])
         }
       } finally {
