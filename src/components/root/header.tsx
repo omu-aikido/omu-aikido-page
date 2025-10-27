@@ -9,7 +9,7 @@ export default function ReactHeader() {
     <div className="bg-neutral-100 dark:bg-neutral-800">
       <nav
         aria-label="Global"
-        className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8"
+        className="mx-auto flex max-w-7xl items-center justify-between p-5 lg:px-8"
       >
         <div className="flex lg:flex-1">
           <a href="/" className="-m-1.5 p-1.5">
@@ -52,7 +52,7 @@ export default function ReactHeader() {
         className="lg:hidden"
       >
         <aside>
-          <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-neutral-100 p-6 sm:max-w-sm sm:ring-1 sm:ring-neutral-900/10 dark:bg-neutral-800 dark:sm:ring-neutral-100/10">
+          <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-neutral-100 p-5 sm:max-w-sm sm:ring-1 sm:ring-neutral-900/10 dark:bg-neutral-800 dark:sm:ring-neutral-100/10">
             <div className="flex items-center justify-between">
               <a href="/" className="-m-1.5 p-1.5">
                 <span className="sr-only">大阪公立大学合氣道部</span>
