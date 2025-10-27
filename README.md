@@ -1,33 +1,53 @@
-# ホームページ
-[![Preview on Cloudflare Pages](https://github.com/omu-aikido/omu-aikido-page/actions/workflows/preview.yml/badge.svg)](https://github.com/omu-aikido/omu-aikido-page/actions/workflows/preview.yml)
-[![Deploy to Cloudflare Pages](https://github.com/omu-aikido/omu-aikido-page/actions/workflows/deploy.yml/badge.svg)](https://github.com/omu-aikido/omu-aikido-page/actions/workflows/deploy.yml)
-
 ## 概要
 
-Astro.jsを使用して開発されています。
-## 開発環境
+- Framework: Astro
+- UI: Astro, React（@astrojs/react）
+- Styling: Tailwind CSS
+- Deployment: Cloudflare Pages（wrangler）
 
-### 依存 （2025-02-09時点）
+## 前提
 
-#### Dependencies
+- Node.js
+- pnpm
 
-- @astrojs/cloudflare: ^12.2.1
-- astro: ^5.2.5
-- ts-ics: ^1.6.6
+## クイックスタート
 
-#### DevDependencies
-
-- @cloudflare/workers-types": "^4.20250204.0"
-- wrangler: ^3.107.3
-
-### ローカルでの開発方法
-
-`npm run prebuild`で[omu-aikido-app](https://github.com/omu-aikido/omu-aikido-app)から必要なLayoutsやコンポーネントを取得します。
-必ず必要なコンポーネントをダウンロードしてから編集するようにしてください。
-また、これらの依存コンポーネントは編集が追跡されません。
-
-```bash
-$ npx astro dev # ローカルサーバを起動します
-$ npx astro build # ビルドします
-$ npx astro preview # プレビューします
+```sh
+# リポジトリルートで実行
+pnpm install
+pnpm dev              # 開発サーバを起動（通常 http://localhost:4321）
 ```
+
+## package.json の主要スクリプト
+
+（プロジェクトの `package.json` を反映）
+
+- `pnpm dev`
+  `astro dev`：ローカル開発サーバを起動
+
+- `pnpm build`
+  `astro build`：本番用にビルド（出力先は Astro の設定に準拠。通常は `dist` または `build`）
+
+- `pnpm preview`
+  `astro build && wrangler pages dev`：ビルド後に wrangler のローカル Pages エミュレーションを起動
+
+- `pnpm deploy`
+  `astro build && wrangler pages deploy dist --project-name=omu-aikido-page --branch=preview`：ビルドして Cloudflare Pages にデプロイ（project-name / branch は package.json にハードコード）
+
+- `pnpm cf-typegen`
+  `wrangler types`：Wrangler 用の型生成（必要に応じて）
+
+- `pnpm format`
+  `prettier --write .`：コード整形
+
+## ディレクトリ構成
+
+- `src/pages/` — ルーティングされるページ（`.astro`, `.mdx`, `.md` など）
+  - `index.astro` → `/`
+- `src/components/` — 再利用コンポーネント（.astro / React コンポーネント）
+- `public/` — 静的アセット（そのまま配信、例: `/images/logo.png`）
+- `package.json`, `README.md` 等プロジェクトルートに配置
+
+## デプロイ（Cloudflare Pages）
+
+[omu-aikido/omu-aikido-page](https://github.com/omu-aikido/omu-aikido-page)へのPRがマージされれば自動的にデプロイされます。

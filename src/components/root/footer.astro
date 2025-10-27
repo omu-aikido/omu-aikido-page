@@ -1,0 +1,55 @@
+---
+import SocialLink from "@/src/components/ui/social-link.astro"
+---
+
+<footer class="my-12 bg-neutral-100 sm:mx-18 lg:mx-24 dark:bg-neutral-800">
+  <div class="mx-2 my-2 text-center">
+    <span class="text-neutral-800 dark:text-neutral-200">
+      <p>&COPY; OMU Aikido Club All Rights Reserved.</p>
+      <p>〒599-8531 大阪府堺市中区学園町1番1号 大阪公立大学合氣道部</p>
+    </span>
+  </div>
+
+  <div class="terms my-3 text-center">
+    <a
+      href="/privacy-policy"
+      class="text-emerald-700 hover:underline dark:text-emerald-300"
+    >
+      プライバシーポリシー
+    </a>
+    <span>&ThickSpace;</span>
+    <a
+      href="/terms-of-service"
+      class="text-emerald-700 hover:underline dark:text-emerald-300"
+    >
+      利用規約
+    </a>
+  </div>
+
+  <div class="mx-8 flex justify-between justify-items-center-safe">
+    <SocialLink
+      link="https://twitter.com/fudaiaiki"
+      aria="旧府大合氣道部 Twitter"
+      icon="twitter-logo"
+      text="旧府大Twitter"
+    />
+    <SocialLink
+      link="https://twitter.com/new_ocuaikido"
+      aria="旧市大合気道サークル Twitter"
+      icon="twitter-logo"
+      text="旧市大Twitter"
+    />
+    <SocialLink
+      link="https://instagram.com/hamudaiaikidoubu"
+      aria="Instagram"
+      icon="instagram-logo"
+      text="Instagram"
+    />
+    <SocialLink
+      link="https://github.com/omu-aikido"
+      aria="GitHub"
+      icon="github-logo"
+      text="GitHub"
+    />
+  </div>
+</footer>

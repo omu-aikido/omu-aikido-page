@@ -1,11 +1,24 @@
 {
-    "extends": "astro/tsconfigs/strict",
-    "include": [".astro/types.d.ts", "**/*"],
-    "exclude": ["dist"],
-    "compilerOptions": {
-        "baseUrl": ".",
-        "paths": {
-            "@/src/*": ["src/*"]
-        }
-    }
+  "extends": "astro/tsconfigs/strict",
+  "include": [
+    ".astro/types.d.ts",
+    "**/*"
+  ],
+  "exclude": [
+    "dist"
+  ],
+  "compilerOptions": {
+    "types": [
+      "./worker-configuration.d.ts",
+      "node"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
+  }
 }

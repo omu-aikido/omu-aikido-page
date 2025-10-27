@@ -1,23 +1,40 @@
 // @ts-check
-import { defineConfig } from "astro/config";
+import { defineConfig } from "astro/config"
 
-import cloudflare from "@astrojs/cloudflare";
+import cloudflare from "@astrojs/cloudflare"
 
-import sitemap from "@astrojs/sitemap";
+import react from "@astrojs/react"
+import tailwindcss from "@tailwindcss/vite"
 
-import partytown from "@astrojs/partytown";
+import mdx from "@astrojs/mdx"
+
+import sitemap from "@astrojs/sitemap"
+import astroLLMsGenerator from "astro-llms-generate"
 
 // https://astro.build/config
 export default defineConfig({
-    site: "https://omu-aikido.com",
-
-    redirects: {
-        "/signin": "https://app.omu-aikido.com/sign-in",
+  adapter: cloudflare({
+    platformProxy: {
+      enabled: true,
     },
 
-    adapter: cloudflare({
-        platformProxy: { enabled: true },
-    }),
+    imageService: "passthrough",
+  }),
 
-    integrations: [sitemap(), partytown()],
-});
+  site: import.meta.env.PROD ? "https://omu-aikido.com" : "http://localhost:4321",
+
+  vite: {
+    plugins: [tailwindcss()],
+  },
+
+  integrations: [
+    react(),
+    mdx(),
+    sitemap(),
+    astroLLMsGenerator({
+      title: "大阪公立大学合氣道部",
+      description:
+        "大阪公立大学で活動する体育会所属の合気道部である、大阪公立大学合氣道部のホームページです",
+    }),
+  ],
+})

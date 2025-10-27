@@ -1,0 +1,8 @@
+---
+import CalendarView from "@/src/components/component/calendarView.tsx"
+import Layout from "@/src/layouts/Layout.astro"
+---
+
+<Layout title="稽古予定" description="今後の稽古予定">
+  <CalendarView client:only />
+</Layout>
