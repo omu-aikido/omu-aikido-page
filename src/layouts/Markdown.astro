@@ -1,6 +1,4 @@
 ---
-import MobileToc from "@/src/components/component/mobile-toc"
-import Toc from "@/src/components/component/toc.astro"
 import type { MarkdownLayoutProps } from "astro"
 import { tv } from "tailwind-variants"
 import Layout from "./Layout.astro"
@@ -8,33 +6,13 @@ import Layout from "./Layout.astro"
 type Props = MarkdownLayoutProps<{
   title: string
   description?: string
-  toc: boolean
 }>
 
-const { frontmatter, headings } = Astro.props
-
-type TocItem = {
-  text: string
-  slug: string
-  children: Array<{ text: string; slug: string }>
-}
-
-const toc: TocItem[] = []
-const underThree = headings.filter((h) => h.depth <= 3)
-for (const h of underThree) {
-  if (h.depth === 2) {
-    toc.push({ text: h.text, slug: h.slug, children: [] })
-  } else if (h.depth === 3) {
-    if (toc.length === 0) {
-      continue
-    }
-    toc[toc.length - 1].children.push({ text: h.text, slug: h.slug })
-  }
-}
+const { frontmatter } = Astro.props
 
 const styles = tv({
   base: [
-    "px-8 sm:px-6 lg:px-8 mx-auto pb-6 bg-neutral-100 dark:bg-neutral-900/80 rounded-lg",
+    "px-6 sm:px-8 mx-auto pb-6 bg-neutral-100 dark:bg-neutral-900/80 rounded-lg",
     "md:min-w-0 pt-4 lg:pt-8",
     "max-w-3xl md:max-w-2xl lg:max-w-none mx-auto",
     "w-full",
@@ -43,27 +21,19 @@ const styles = tv({
     "[&_h2]:text-2xl [&_h2]:pt-4 [&_h2]:pb-2 [&_h2]:font-bold",
     "[&_h3]:text-lg [&_h3]:pt-3 [&_h3]:pb-1 [&_h3]:font-semibold",
     "[&_h4]:text-base [&_h4]:pt-2 [&_h4]:pb-1",
-    "[&_p]:text-base [&_p]:pt-2 [&_p]:pb-1",
-    "[&_a]:text-emerald-500 [&_a]:underline [&_a]:hover:-blue-500",
-    "[&_ul]:list-disc [&_ul]:pl-4 [&_ul]:pb-2",
-    "[&_li]:pb-2",
+    "[&_p]:text-base [&_p]:pt-2 [&_p]:pb-1 [&_p]:px-2",
+    "[&_a]:text-emerald-700 [&_a]:dark:text-emerald-400 [&_a]:underline [&_a]:hover:text-blue-500 [&_a]:px-2",
+    "[&_ul]:list-disc [&_ul]:pl-4 [&_ul]:pb-2 [&_ul]:px-2",
+    "[&_li]:pb-2, [&_li]:px-2",
     "[&_blockquote]:border-l-2 [&_blockquote]:border-neutral-300 [&_blockquote]:dark:border-neutral-600 [&_blockquote]:pl-4",
+    "[&_img]:mb-4 [&_img]:px-2 [&_img]:sm:max-w-96 [&_img]:h-auto",
   ],
 })
 
 const articleLayout = tv({
-  base: ["w-full"],
-  variants: {
-    centered: {
-      true: "lg:col-span-9 lg:col-start-3",
-      false: "lg:col-span-9",
-    },
-  },
-  defaultVariants: {
-    centered: false,
-  },
+  base: ["w-full", "lg:col-span-9"],
 })
-const articleLayoutClass = articleLayout({ centered: !frontmatter.toc })
+const articleLayoutClass = articleLayout()
 ---
 
 <Layout title={frontmatter.title} description={frontmatter.description ?? ""}>
@@ -74,38 +44,11 @@ const articleLayoutClass = articleLayout({ centered: !frontmatter.toc })
       {frontmatter.title}
     </h1>
 
-    {
-      frontmatter.toc && (
-        <div class="mx-auto items-center px-4 sm:px-6 lg:hidden">
-          <div class="sticky top-16 z-40">
-            <MobileToc
-              toc={toc}
-              client:load
-              aria-label="Table of contents (mobile)"
-            />
-          </div>
-        </div>
-      )
-    }
-
     <article
       class={`${articleLayoutClass} ${styles()}`}
       aria-label="Article content"
     >
       <slot />
     </article>
-
-    {
-      frontmatter.toc && (
-        <aside class="sticky top-24 mx-auto hidden lg:col-span-3 lg:block">
-          <nav
-            class="max-h-[calc(100vh-6rem)] overflow-auto"
-            aria-label="Table of contents"
-          >
-            <Toc toc={toc} />
-          </nav>
-        </aside>
-      )
-    }
   </div>
 </Layout>

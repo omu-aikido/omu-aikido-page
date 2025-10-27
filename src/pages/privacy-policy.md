@@ -1,7 +1,6 @@
 ---
 layout: ../layouts/Markdown.astro
 title: プライバシーポリシー
-toc: true
 ---
 
 # プライバシーポリシー

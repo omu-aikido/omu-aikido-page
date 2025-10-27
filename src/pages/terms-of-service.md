@@ -1,7 +1,6 @@
 ---
 layout: ../layouts/Markdown.astro
 title: 利用規約
-toc: true
 ---
 
 # 利用規約
