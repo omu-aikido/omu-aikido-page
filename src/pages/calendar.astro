@@ -4,5 +4,43 @@ import Layout from "@/src/layouts/Layout.astro"
 ---
 
 <Layout title="稽古予定" description="今後の稽古予定">
-  <CalendarView client:only />
+  <div class="mx-auto px-6 py-8 sm:max-w-3xl lg:max-w-6xl">
+    {/* Header Section */}
+    <div class="mb-8">
+      <h1
+        class="mb-4 text-3xl font-bold text-neutral-900 dark:text-neutral-100"
+      >
+        稽古予定
+      </h1>
+    </div>
+    <CalendarView client:only />
+
+    <div
+      id="google-calendar-navigation"
+      class="mx-6 flex items-start rounded-lg border border-neutral-200 bg-neutral-50 p-6 dark:border-neutral-600 dark:bg-neutral-700/50"
+    >
+      <svg
+        class="mt-0.5 mr-3 h-5 w-5 shrink-0 text-blue-500"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width={2}
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      <p class="text-neutral-600 dark:text-neutral-300">
+        <a
+          href="https://calendar.google.com/calendar/embed?src=new.ocuaikido%40gmail.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-emerald-600 underline dark:text-emerald-400"
+        >
+          Googleカレンダー</a
+        >では過去の稽古や１ヶ月以上先の稽古予定も確認できます。
+      </p>
+    </div>
+  </div>
 </Layout>
