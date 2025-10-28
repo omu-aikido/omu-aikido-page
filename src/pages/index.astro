@@ -1,6 +1,8 @@
 ---
 import aikidoImage from "@/src/assets/84DABC3E-78F6-4FAC-B2EB-F98F5DDDFC15.webp"
 import NavCard from "@/src/components/ui/navcard.astro"
+import Loading from "@/src/components/ui/loadings.astro"
+import NewsList from "@/src/components/component/NewsList.astro"
 import Layout from "@/src/layouts/Layout.astro"
 import { Image } from "astro:assets"
 ---
@@ -62,6 +64,14 @@ import { Image } from "astro:assets"
         </svg>
       </div>
     </div>
+  </section>
+
+  <section class="px-6 min-h-48">
+    <NewsList server:defer>
+      <div slot="fallback" class="flex flex-col items-center justify-center  pointer-events-none inset-0 rounded-lg">
+        <Loading />
+      </div>
+    </NewsList>
   </section>
 
   <section class="my-16 px-6">
