@@ -1,14 +1,12 @@
 ---
+import aikidoImage from "@/src/assets/84DABC3E-78F6-4FAC-B2EB-F98F5DDDFC15.webp"
+import NavCard from "@/src/components/ui/navcard.astro"
 import Layout from "@/src/layouts/Layout.astro"
 import { Image } from "astro:assets"
-import NavCard from "@/src/components/ui/navcard.astro"
-import aikidoImage from "@/src/assets/84DABC3E-78F6-4FAC-B2EB-F98F5DDDFC15.webp"
 ---
 
 <Layout title="トップ" description="大阪公立大学合氣道部">
-  <section
-    class="my-8 px-6 py-16"
-  >
+  <section class="my-8 px-6 py-16">
     <div class="text-center">
       <h1
         class="mb-6 text-4xl font-bold text-neutral-900 md:text-6xl dark:text-neutral-100"
@@ -22,29 +20,42 @@ import aikidoImage from "@/src/assets/84DABC3E-78F6-4FAC-B2EB-F98F5DDDFC15.webp"
       </p>
       <a
         href="/about"
-        class="inline-block rounded-lg bg-emerald-600 px-8 py-3 font-semibold text-white transition-colors duration-200 hover:bg-emerald-700"
+        aria-label="私たちについて"
+        class="inline-block rounded-lg bg-emerald-800 px-8 py-3 font-semibold text-white transition-colors duration-200 hover:bg-emerald-700"
       >
         もっと知る
       </a>
     </div>
-    <div class="absolute inset-0 -z-10 pointer-events-none" aria-hidden="true">
-      <div class="absolute inset-0 rounded-lg bg-linear-to-b from-emerald-50/60 to-transparent dark:from-emerald-900/30"></div>
-      <div class="absolute left-1/2 top-1/2 w-screen -translate-x-1/2 -translate-y-1/2 blur-3xl opacity-30 dark:opacity-20">
-        <svg viewBox="0 0 800 400" class="w-full h-auto" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+      <div
+        class="absolute inset-0 rounded-lg bg-linear-to-b from-emerald-50/60 to-transparent dark:from-emerald-900/30"
+      >
+      </div>
+      <div
+        class="absolute top-1/2 left-1/2 w-fit -translate-x-1/2 -translate-y-1/2 opacity-30 blur-3xl dark:opacity-20"
+      >
+        <svg
+          viewBox="0 0 800 400"
+          class="h-auto w-full"
+          xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="none"
+        >
           <defs>
             <radialGradient id="g1" cx="30%" cy="40%" r="50%">
-              <stop offset="0%" stop-color="#34d399" stop-opacity="0.45"/>
-              <stop offset="60%" stop-color="#34d399" stop-opacity="0.18"/>
-              <stop offset="100%" stop-color="#34d399" stop-opacity="0"/>
+              <stop offset="0%" stop-color="#34d399" stop-opacity="0.45"></stop>
+              <stop offset="60%" stop-color="#34d399" stop-opacity="0.18"
+              ></stop>
+              <stop offset="100%" stop-color="#34d399" stop-opacity="0"></stop>
             </radialGradient>
             <radialGradient id="g2" cx="80%" cy="60%" r="50%">
-              <stop offset="0%" stop-color="#10b981" stop-opacity="0.35"/>
-              <stop offset="60%" stop-color="#10b981" stop-opacity="0.12"/>
-              <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+              <stop offset="0%" stop-color="#10b981" stop-opacity="0.35"></stop>
+              <stop offset="60%" stop-color="#10b981" stop-opacity="0.12"
+              ></stop>
+              <stop offset="100%" stop-color="#10b981" stop-opacity="0"></stop>
             </radialGradient>
           </defs>
-          <rect width="800" height="400" fill="url(#g1)"/>
-          <rect width="800" height="400" fill="url(#g2)"/>
+          <rect width="800" height="400" fill="url(#g1)"></rect>
+          <rect width="800" height="400" fill="url(#g2)"></rect>
         </svg>
       </div>
     </div>
@@ -54,14 +65,14 @@ import aikidoImage from "@/src/assets/84DABC3E-78F6-4FAC-B2EB-F98F5DDDFC15.webp"
     <div class="mb-8 flex items-center justify-between">
       <a
         href="/about/aikido"
-        class="font-semibold text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+        class="font-semibold text-emerald-800 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
       >
         <h2 class="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
           合気道を知る
         </h2>
       </a>
     </div>
-    <div class="rounded-lg bg-white/70 p-8 shadow-md dark:bg-neutral-700/70 backdrop-blur-md">
+    <div class="rounded-lg bg-white/20 p-8 shadow-md dark:bg-neutral-700/20">
       <div class="grid items-center gap-8 md:grid-cols-2">
         <div
           class="[&_p]:mb-4 [&_p]:text-neutral-600 [&_p]:dark:text-neutral-300"
@@ -79,6 +90,7 @@ import aikidoImage from "@/src/assets/84DABC3E-78F6-4FAC-B2EB-F98F5DDDFC15.webp"
             試合や競技は行わず、お互いに切磋琢磨し合って稽古を積み重ねることを目的としています。
           </p>
           <a
+            title="合気道についてもっと詳しく知る"
             href="/about/aikido"
             class="inline-block rounded-lg bg-emerald-600 px-6 py-2 font-semibold text-white transition-colors duration-200 hover:bg-emerald-700"
           >

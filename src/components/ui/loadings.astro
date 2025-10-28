@@ -1,0 +1,58 @@
+---
+interface Props {
+  class?: string
+  size?: number | string
+  title?: string
+}
+
+const {
+  class: className = "",
+  size = 48,
+  title = "読み込み中",
+} = Astro.props as Props
+
+const sizeValue = typeof size === "number" ? `${size}px` : size
+---
+
+<div
+  class={`inline-flex items-center justify-center ${className}`}
+  role="status"
+  aria-live="polite"
+  aria-label={title}
+>
+  <svg
+    width={sizeValue}
+    height={sizeValue}
+    viewBox="0 0 50 50"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+    style="display:block"
+    class="animate-spin"
+  >
+    <!-- background ring -->
+    <circle
+      cx="25"
+      cy="25"
+      r="20"
+      stroke="currentColor"
+      stroke-opacity="0.12"
+      stroke-width="5"
+      fill="none"></circle>
+    <!-- foreground arc -->
+    <path
+      d="M45 25a20 20 0 0 1-20 20"
+      stroke="currentColor"
+      stroke-width="5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      fill="none"></path>
+  </svg>
+
+  <span
+    class="absolute -m-px h-px w-px overflow-hidden border-0 p-0 whitespace-nowrap"
+    style="clip:rect(0,0,0,0)"
+  >
+    {title}
+  </span>
+</div>

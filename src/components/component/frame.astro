@@ -1,0 +1,31 @@
+---
+import Loading from "../ui/loadings.astro"
+
+const {
+  src,
+  class:
+    iframeClass = "h-100 w-full rounded-lg border-0 dark:contrast-90 dark:invert",
+  loading = "lazy",
+  allowFullScreen = true,
+  title = "Embedded content",
+} = Astro.props as any
+---
+
+<div class="relative">
+  <div
+    class="pointer-events-none absolute inset-0 flex items-center justify-center rounded-lg bg-neutral-500/10"
+    aria-hidden="true"
+  >
+    <Loading
+      class="text-neutral-700/30 dark:text-neutral-200/30"
+      size={48}
+      title="読み込み中"
+    />
+  </div>
+  <iframe
+    src={src}
+    title={title}
+    loading={loading}
+    class={`relative z-10 ${iframeClass}`}
+    {...allowFullScreen ? { allowfullscreen: true } : {}}></iframe>
+</div>

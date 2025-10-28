@@ -87,14 +87,7 @@ export default function CalendarView({
   }
 
   return (
-    <div className="mx-auto px-6 py-8 sm:max-w-3xl lg:max-w-6xl">
-      {/* Header Section */}
-      <div className="mb-8">
-        <h1 className="mb-4 text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-          稽古予定
-        </h1>
-      </div>
-
+    <>
       {/* Loading State */}
       {loading && (
         <div className="py-12 text-center">
@@ -107,7 +100,7 @@ export default function CalendarView({
 
       {/* Error State */}
       {error && (
-        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-900/20">
+        <div className="mx-6 mb-6 rounded-lg border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-900/20">
           <div className="flex items-center">
             <div className="shrink-0">
               <svg
@@ -244,30 +237,8 @@ export default function CalendarView({
               </div>
             ))}
           </div>
-
-          {/* Additional Info Section */}
-          <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-6 dark:border-neutral-600 dark:bg-neutral-700/50">
-            <div className="flex items-start">
-              <svg
-                className="mt-0.5 mr-3 h-5 w-5 shrink-0 text-blue-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <p className="text-sm text-neutral-600 dark:text-neutral-300">
-                Googleカレンダーでは過去の稽古や１ヶ月以上先の稽古予定も確認できます。
-              </p>
-            </div>
-          </div>
         </>
       )}
-    </div>
+    </>
   )
 }
