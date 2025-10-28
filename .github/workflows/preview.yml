@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-production:
+  deploy-preview:
     runs-on: ubuntu-latest
     env:
       TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
