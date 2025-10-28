@@ -21,18 +21,21 @@ import { Image } from "astro:assets"
       <a
         href="/about"
         aria-label="私たちについて"
-        class="inline-block rounded-lg bg-emerald-800 px-8 py-3 font-semibold text-white transition-colors duration-200 hover:bg-emerald-700"
+        class="inline-block rounded-lg bg-emerald-700 px-8 py-3 font-semibold text-white transition-colors duration-200 hover:bg-emerald-700"
       >
         もっと知る
       </a>
     </div>
-    <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+    <div
+      class="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+      aria-hidden="true"
+    >
       <div
         class="absolute inset-0 rounded-lg bg-linear-to-b from-emerald-50/60 to-transparent dark:from-emerald-900/30"
       >
       </div>
       <div
-        class="absolute top-1/2 left-1/2 w-fit -translate-x-1/2 -translate-y-1/2 opacity-30 blur-3xl dark:opacity-20"
+        class="absolute top-1/2 left-1/2 w-352 -translate-x-1/2 -translate-y-1/2 opacity-80 blur-3xl dark:opacity-20"
       >
         <svg
           viewBox="0 0 800 400"
