@@ -68,9 +68,9 @@
           <header class="mb-2 flex items-start justify-between gap-3">
             <h3
               :id="`news-${item.id}`"
-              class="text-base font-semibold text-neutral-900 dark:text-neutral-100"
+              class="text-base font-semibold text-neutral-900 dark:text-neutral-100 truncate"
             >
-              {{ item.title.length > 20 ? item.title.slice(0, 20) + "…" : item.title }}
+              {{ item.title }}
             </h3>
           </header>
 
@@ -109,9 +109,10 @@ const fetchError = ref<string | null>(null)
 const isLoading = ref(true)
 
 const getPreview = (content: string) => {
+  const NEWS_READ_MORE = 30
   if (!content) return ""
-  const isLong = content.length > 30
-  return isLong ? content.slice(0, 30).trimEnd() + "…" : content
+  const isLong = content.length > NEWS_READ_MORE
+  return isLong ? content.slice(0, NEWS_READ_MORE).trimEnd() + "…" : content
 }
 
 onMounted(async () => {

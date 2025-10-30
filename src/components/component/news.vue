@@ -99,15 +99,17 @@ const fetchError = ref<string | null>(null)
 const isLoading = ref(true)
 const url = "https://api.omu-aikido.com/news"
 
+const NEWS_READ_MORE_THRESHOLD = 40
+
 // Helper: determine whether an item is long enough to need "続きを読む"
 const isLong = (item: NewsItem) => {
-  return !!item.content && item.content.length > 40
+  return !!item.content && item.content.length > NEWS_READ_MORE_THRESHOLD
 }
 
 // Helper: get preview text for long items
 const getPreview = (item: NewsItem) => {
   if (!item.content) return ""
-  return item.content.slice(0, 40).trimEnd() + "…"
+  return item.content.slice(0, NEWS_READ_MORE_THRESHOLD).trimEnd() + "…"
 }
 
 // Helper: format ISO date to ja-JP
