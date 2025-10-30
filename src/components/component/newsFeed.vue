@@ -70,21 +70,21 @@
               :id="`news-${item.id}`"
               class="text-base font-semibold text-neutral-900 dark:text-neutral-100"
             >
-              {{ item.title.length > 16 ? item.title.slice(0, 16) + "…" : item.title }}
+              {{ item.title.length > 20 ? item.title.slice(0, 20) + "…" : item.title }}
             </h3>
-            <time
-              v-if="item.date"
-              class="ml-auto text-xs whitespace-nowrap text-neutral-500 dark:text-neutral-400"
-              :datetime="item.date"
-              :aria-label="`更新日: ${item.date}`"
-            >
-              {{ new Date(item.date).toLocaleDateString("ja-JP") }}
-            </time>
           </header>
 
           <div class="text-sm text-neutral-700 dark:text-neutral-300">
             <p class="whitespace-pre-wrap">{{ getPreview(item.content) }}</p>
           </div>
+          <time
+            v-if="item.date"
+            class="place-items-end ml-auto text-xs whitespace-nowrap text-neutral-500 dark:text-neutral-400"
+            :datetime="item.date"
+            :aria-label="`公開日: ${item.date}`"
+          >
+            {{ new Date(item.date).toLocaleString("ja-JP") }}
+          </time>
         </a>
       </article>
     </div>

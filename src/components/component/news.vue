@@ -36,7 +36,7 @@
         role="article"
         :aria-labelledby="`news-${item.id}`"
       >
-        <header class="mb-2 flex items-start justify-between gap-4">
+        <header class="mb-2 flex flex-col items-start justify-between">
           <h2
             :id="`news-${item.id}`"
             class="text-lg font-semibold text-neutral-900 dark:text-neutral-100"
@@ -47,24 +47,24 @@
             v-if="item.date"
             class="ml-auto text-sm whitespace-nowrap text-neutral-500 dark:text-neutral-300"
             :datetime="item.date"
-            :aria-label="`更新日: ${item.date}`"
+            :aria-label="`公開日: ${item.date}`"
           >
             {{ formatDate(item.date) }}
           </time>
         </header>
 
         <template v-if="isLong(item)">
-          <details class="group">
+          <details class="group flex flex-col-reverse" :id="`news-item-${item.id}`">
             <summary class="cursor-pointer list-none">
-              <div class="mb-4 group-open:hidden">
+              <div class="group-open:hidden">
                 <p class="text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
                   {{ getPreview(item) }}
                 </p>
               </div>
-              <div class="font-semibold text-cyan-600 group-open:hidden hover:text-cyan-700 dark:text-cyan-400">
+              <div class="text-right font-semibold text-cyan-600 group-open:hidden hover:text-cyan-700 dark:text-cyan-400">
                 続きを読む
               </div>
-              <div class="mb-4 hidden font-semibold text-cyan-600 group-open:block hover:text-cyan-700 dark:text-cyan-400">
+              <div class="hidden text-right font-semibold text-cyan-600 group-open:block hover:text-cyan-700 dark:text-cyan-400">
                 閉じる
               </div>
             </summary>
@@ -101,13 +101,13 @@ const url = "https://api.omu-aikido.com/news"
 
 // Helper: determine whether an item is long enough to need "続きを読む"
 const isLong = (item: NewsItem) => {
-  return !!item.content && item.content.length > 70
+  return !!item.content && item.content.length > 40
 }
 
 // Helper: get preview text for long items
 const getPreview = (item: NewsItem) => {
   if (!item.content) return ""
-  return item.content.slice(0, 70).trimEnd() + "…"
+  return item.content.slice(0, 40).trimEnd() + "…"
 }
 
 // Helper: format ISO date to ja-JP
@@ -115,7 +115,7 @@ const formatDate = (date?: string) => {
   if (!date) return ""
   // Use try/catch to avoid invalid date causing exceptions
   try {
-    return new Date(date).toLocaleDateString("ja-JP")
+    return new Date(date).toLocaleString("ja-JP")
   } catch {
     return date
   }

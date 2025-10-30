@@ -101,7 +101,9 @@ function getTitleClass(title: string) {
   if (title.includes("中百舌鳥")) {
     return "mb-2 text-lg font-semibold text-cyan-600 dark:text-cyan-300";
   } else if (title.includes("杉本")) {
-    return "mb-2 text-lg font-semibold text-cyan-700 dark:text-cyan-300";
+    return "mb-2 text-lg font-semibold text-green-700 dark:text-green-300";
+  } else if (title.includes("会")) {
+    return "mb-2 text-lg font-semibold text-orange-700 dark:text-orange-300";
   } else {
     return "mb-2 text-lg font-semibold text-neutral-900 dark:text-neutral-100";
   }
