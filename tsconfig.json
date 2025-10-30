@@ -4,11 +4,11 @@
   "exclude": ["dist"],
   "compilerOptions": {
     "types": ["./worker-configuration.d.ts", "node"],
+    "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
     },
-    "jsx": "react-jsx",
-    "jsxImportSource": "react"
+    "jsx": "preserve"
   }
 }

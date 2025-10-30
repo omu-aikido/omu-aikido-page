@@ -23,5 +23,10 @@
     }
   },
   "format_on_save": "off",
-  "language_servers": ["!markdown-oxide", "..."]
+  "language_servers": ["!markdown-oxide", "..."],
+  "languages": {
+    "JSONC": {
+      "language_servers": ["biome", "!json-language-server"]
+    }
+  }
 }

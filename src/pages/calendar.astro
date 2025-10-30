@@ -1,6 +1,7 @@
 ---
-import CalendarView from "@/src/components/component/calendarView.tsx"
-import Layout from "@/src/layouts/Layout.astro"
+import CalendarView from "@/components/component/calendarView.vue"
+import Layout from "@/layouts/Layout.astro"
+import Loadings from "@/components/ui/loadings.astro"
 ---
 
 <Layout title="稽古予定" description="今後の稽古予定">
@@ -13,7 +14,7 @@ import Layout from "@/src/layouts/Layout.astro"
         稽古予定
       </h1>
     </div>
-    <CalendarView client:only />
+    <CalendarView client:load />
 
     <div
       id="google-calendar-navigation"

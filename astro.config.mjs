@@ -3,7 +3,7 @@ import { defineConfig } from "astro/config"
 
 import cloudflare from "@astrojs/cloudflare"
 
-import react from "@astrojs/react"
+import vue from "@astrojs/vue"
 import tailwindcss from "@tailwindcss/vite"
 
 import mdx from "@astrojs/mdx"
@@ -21,6 +21,8 @@ export default defineConfig({
     imageService: "passthrough",
   }),
 
+  site: "https://omu-aikido.com",
+
   output: "static",
 
   prefetch: {
@@ -34,7 +36,7 @@ export default defineConfig({
   },
 
   integrations: [
-    react(),
+    vue(),
     mdx(),
     sitemap(),
     astroLLMsGenerator({
