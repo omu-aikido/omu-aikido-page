@@ -21,11 +21,7 @@ const { icon, title, desc, link } = Astro.props
     aria-label={desc}
     class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full"
   >
-    <Icon
-      icon={icon}
-      size="13"
-      class="text-emerald-600 dark:text-emerald-400"
-    />
+    <Icon icon={icon} size="13" class="text-cyan-600 dark:text-cyan-400" />
   </a>
   <h3 class="mb-2 text-lg font-semibold text-neutral-900 dark:text-neutral-100">
     {title}
@@ -37,7 +33,7 @@ const { icon, title, desc, link } = Astro.props
     href={link}
     title={title}
     aria-label={desc}
-    class="font-semibold text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+    class="font-semibold text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300"
   >
     詳しく見る
   </a>

@@ -1,5 +1,7 @@
 ---
 import aikidoImage from "@/src/assets/84DABC3E-78F6-4FAC-B2EB-F98F5DDDFC15.webp"
+import bg_light from "@/src/assets/wp11455879-gradient-blur-wallpapers.webp"
+import bg_dark from "@/src/assets/wp11455879-gradient-blur-wallpapers-dark.webp"
 import NavCard from "@/src/components/ui/navcard.astro"
 import Loading from "@/src/components/ui/loadings.astro"
 import NewsList from "@/src/components/component/NewsList.astro"
@@ -23,7 +25,7 @@ import { Image } from "astro:assets"
       <a
         href="/about"
         aria-label="私たちについて"
-        class="inline-block rounded-lg bg-emerald-700 px-8 py-3 font-semibold text-white transition-colors duration-200 hover:bg-emerald-700"
+        class="inline-block rounded-lg bg-cyan-700 px-8 py-3 font-semibold text-white transition-colors duration-200 hover:bg-cyan-700"
       >
         もっと知る
       </a>
@@ -33,42 +35,18 @@ import { Image } from "astro:assets"
       aria-hidden="true"
     >
       <div
-        class="absolute inset-0 rounded-lg bg-linear-to-b from-emerald-50/60 to-transparent dark:from-emerald-900/30"
+        class="absolute inset-0 rounded-lg bg-linear-to-b from-cyan-100/60 to-transparent dark:from-cyan-900/30"
       >
-      </div>
-      <div
-        class="absolute top-1/2 left-1/2 w-352 -translate-x-1/2 -translate-y-1/2 opacity-80 blur-3xl dark:opacity-20"
-      >
-        <svg
-          viewBox="0 0 800 400"
-          class="h-auto w-full"
-          xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="none"
-        >
-          <defs>
-            <radialGradient id="g1" cx="30%" cy="40%" r="50%">
-              <stop offset="0%" stop-color="#34d399" stop-opacity="0.45"></stop>
-              <stop offset="60%" stop-color="#34d399" stop-opacity="0.18"
-              ></stop>
-              <stop offset="100%" stop-color="#34d399" stop-opacity="0"></stop>
-            </radialGradient>
-            <radialGradient id="g2" cx="80%" cy="60%" r="50%">
-              <stop offset="0%" stop-color="#10b981" stop-opacity="0.35"></stop>
-              <stop offset="60%" stop-color="#10b981" stop-opacity="0.12"
-              ></stop>
-              <stop offset="100%" stop-color="#10b981" stop-opacity="0"></stop>
-            </radialGradient>
-          </defs>
-          <rect width="800" height="400" fill="url(#g1)"></rect>
-          <rect width="800" height="400" fill="url(#g2)"></rect>
-        </svg>
       </div>
     </div>
   </section>
 
-  <section class="px-6 min-h-48">
+  <section class="min-h-48 px-6">
     <NewsList server:defer>
-      <div slot="fallback" class="flex flex-col items-center justify-center  pointer-events-none inset-0 rounded-lg">
+      <div
+        slot="fallback"
+        class="pointer-events-none inset-0 flex flex-col items-center justify-center rounded-lg"
+      >
         <Loading />
       </div>
     </NewsList>
@@ -78,7 +56,7 @@ import { Image } from "astro:assets"
     <div class="mb-8 flex items-center justify-between">
       <a
         href="/about/aikido"
-        class="font-semibold text-emerald-800 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+        class="font-semibold text-cyan-800 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300"
       >
         <h2 class="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
           合気道を知る
@@ -105,7 +83,7 @@ import { Image } from "astro:assets"
           <a
             title="合気道についてもっと詳しく知る"
             href="/about/aikido"
-            class="inline-block rounded-lg bg-emerald-600 px-6 py-2 font-semibold text-white transition-colors duration-200 hover:bg-emerald-700"
+            class="inline-block rounded-lg bg-cyan-600 px-6 py-2 font-semibold text-white transition-colors duration-200 hover:bg-cyan-700"
           >
             もっと詳しく
           </a>
@@ -114,6 +92,7 @@ import { Image } from "astro:assets"
           <Image
             src={aikidoImage}
             alt="座技呼吸法を指導する様子"
+            loading="eager"
             class="mx-auto flex h-56 w-56 items-center justify-center rounded-full bg-neutral-200 dark:bg-neutral-600"
           />
         </div>
@@ -159,7 +138,7 @@ import { Image } from "astro:assets"
 
     <section class="my-16 px-6">
       <div
-        class="rounded-lg bg-linear-to-r from-emerald-50 to-emerald-100 p-8 text-center dark:from-emerald-900/20 dark:to-emerald-800/20"
+        class="rounded-lg bg-linear-to-r from-cyan-50 to-cyan-100 p-8 text-center dark:from-cyan-900/20 dark:to-cyan-800/20"
       >
         <h2
           class="mb-4 text-3xl font-bold text-neutral-900 dark:text-neutral-100"
@@ -173,7 +152,7 @@ import { Image } from "astro:assets"
         </p>
         <a
           href="/contact"
-          class="inline-block rounded-lg bg-emerald-600 px-8 py-3 font-semibold text-white transition-colors duration-200 hover:bg-emerald-700"
+          class="inline-block rounded-lg bg-cyan-600 px-8 py-3 font-semibold text-white transition-colors duration-200 hover:bg-cyan-700"
         >
           お問い合わせ
         </a>

@@ -165,7 +165,7 @@ export default function CalendarView({
                         {event.title}
                       </h3>
                     ) : event.title.includes("杉本") ? (
-                      <h3 className="mb-2 text-lg font-semibold text-emerald-700 dark:text-emerald-300">
+                      <h3 className="mb-2 text-lg font-semibold text-cyan-700 dark:text-cyan-300">
                         {event.title}
                       </h3>
                     ) : (

@@ -1,6 +1,4 @@
 ---
-export const prerender = false
-
 const limit = 3
 
 const url = "https://api.omu-aikido.com/news"
@@ -14,38 +12,39 @@ type NewsItem = {
 
 let data: NewsItem[] = []
 let fetchError: string | null = null
-if (import.meta.env.PROD){
-try {
-  const res = await fetch(url)
-  if (!res.ok) {
-    fetchError = `ニュースの取得に失敗しました（HTTP ${res.status}）`
-  } else {
-    const json = await res.json()
-    if (Array.isArray(json)) {
-      const allNews = json.map((d: any) => ({
-        id: d?.id ? String(d.id) : Math.random().toString(36),
-        title: d?.title ? String(d.title) : "(無題)",
-        content: d?.content ? String(d.content) : "",
-        date: d?.date ? String(d.date) : undefined,
-      })) as NewsItem[]
-
-      // 最新のものから指定件数取得
-      data = allNews.slice(0, limit)
+if (import.meta.env.PROD) {
+  try {
+    const res = await fetch(url)
+    if (!res.ok) {
+      fetchError = `ニュースの取得に失敗しました（HTTP ${res.status}）`
     } else {
-      fetchError = "API のレスポンスが予期した形式ではありません。"
+      const json = await res.json()
+      if (Array.isArray(json)) {
+        const allNews = json.map((d: any) => ({
+          id: d?.id ? String(d.id) : Math.random().toString(36),
+          title: d?.title ? String(d.title) : "(無題)",
+          content: d?.content ? String(d.content) : "",
+          date: d?.date ? String(d.date) : undefined,
+        })) as NewsItem[]
+
+        // 最新のものから指定件数取得
+        data = allNews.slice(0, limit)
+      } else {
+        fetchError = "API のレスポンスが予期した形式ではありません。"
+      }
     }
+  } catch (err) {
+    fetchError = "ニュースの取得中にエラーが発生しました。"
   }
-} catch (err) {
-  fetchError = "ニュースの取得中にエラーが発生しました。"
-}
 }
 
-if (import.meta.env.DEV){
+if (import.meta.env.DEV) {
   data = [
     {
       id: "0",
       title: "新しい機能が追加されました",
-      content: "新しい機能が追加されました。詳細はお知らせページをご覧ください。",
+      content:
+        "新しい機能が追加されました。詳細はお知らせページをご覧ください。",
       date: "2023-03-01",
     },
     {
@@ -57,86 +56,109 @@ if (import.meta.env.DEV){
     {
       id: "3",
       title: "新しい機能が追加されました。ついでに新しい家族が増えました。",
-      content: "新しい機能が追加されました。詳細はお知らせページをご覧ください。このアップデートではすべてのユーザーに対し、アカウントの削除が許可されるようになります。",
+      content:
+        "新しい機能が追加されました。詳細はお知らせページをご覧ください。このアップデートではすべてのユーザーに対し、アカウントの削除が許可されるようになります。",
       date: "2023-03-04",
     },
-  ];
+  ]
 }
-
 ---
 
 <>
-  <div class="mb-6 flex flex-row justify-between items-center">
+  <div class="mb-6 flex flex-row items-center justify-between">
     <h2 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
       お知らせ
     </h2>
 
-    { !fetchError && data.length > 0 ? (
-      <div class="text-center">
-        <a
-          href="/news"
-          class="inline-flex items-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900"
-        >
-          すべてのお知らせを見る
-          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-          </svg>
-        </a>
-      </div>
-    ) : null}
+    {
+      !fetchError && data.length > 0 ? (
+        <div class="text-center">
+          <a
+            href="/news"
+            class="inline-flex items-center rounded-lg bg-cyan-600 px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-cyan-700 focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:outline-none dark:focus:ring-offset-neutral-900"
+          >
+            すべてのお知らせを見る
+            <svg
+              class="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </a>
+        </div>
+      ) : null
+    }
   </div>
 
   <div class="space-y-4">
-    {fetchError ? (
-      <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
-        {fetchError}
-      </div>
-    ) : null}
+    {
+      fetchError ? (
+        <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
+          {fetchError}
+        </div>
+      ) : null
+    }
 
-    {!fetchError && data.length === 0 ? (
-      <div class="rounded-lg bg-white/50 p-4 text-center text-sm text-neutral-700 shadow-sm dark:bg-neutral-700/50 dark:text-neutral-300">
-        現在、お知らせはありません。
-      </div>
-    ) : null}
+    {
+      !fetchError && data.length === 0 ? (
+        <div class="rounded-lg bg-white/50 p-4 text-center text-sm text-neutral-700 shadow-sm dark:bg-neutral-700/50 dark:text-neutral-300">
+          現在、お知らせはありません。
+        </div>
+      ) : null
+    }
 
-    {data.map((item) => {
-      const isLong = item.content && item.content.length > 30
-      const preview = isLong
-        ? item.content.slice(0, 30).trimEnd() + "……"
-        : item.content || ""
+    {
+      data.map((item) => {
+        const isLong = item.content && item.content.length > 30
+        const preview = isLong
+          ? item.content.slice(0, 30).trimEnd() + "…"
+          : item.content || ""
 
-      return (
-        <article
-          class="rounded-lg bg-neutral-100/40 p-4 shadow-sm transition-shadow duration-200 hover:shadow-md dark:bg-neutral-700/40"
-          role="article"
-          aria-labelledby={`news-${item.id}`}
-        >
-          <a href={`/news#news-${item.id}`} aria-label={`Read more about ${item.title}`}>
-          <header class="mb-2 flex items-start justify-between gap-3">
-            <h3
-              id={`news-${item.id}`}
-              class="text-base font-semibold text-neutral-900 dark:text-neutral-100"
+        return (
+          <article
+            class="rounded-lg bg-neutral-100/40 p-4 shadow-sm transition-shadow duration-200 hover:shadow-md dark:bg-neutral-700/40"
+            role="article"
+            aria-labelledby={`news-${item.id}`}
+          >
+            <a
+              href={`/news#news-${item.id}`}
+              aria-label={`Read more about ${item.title}`}
             >
-              {item.title.length > 16 ? item.title.slice(0, 16) + "……" : item.title}
-            </h3>
-            {item.date ? (
-              <time
-                class="ml-auto whitespace-nowrap text-xs text-neutral-500 dark:text-neutral-400"
-                datetime={item.date}
-                aria-label={`更新日: ${item.date}`}
-              >
-                {new Date(item.date).toLocaleDateString("ja-JP")}
-              </time>
-            ) : null}
-          </header>
+              <header class="mb-2 flex items-start justify-between gap-3">
+                <h3
+                  id={`news-${item.id}`}
+                  class="text-base font-semibold text-neutral-900 dark:text-neutral-100"
+                >
+                  {item.title.length > 16
+                    ? item.title.slice(0, 16) + "…"
+                    : item.title}
+                </h3>
+                {item.date ? (
+                  <time
+                    class="ml-auto text-xs whitespace-nowrap text-neutral-500 dark:text-neutral-400"
+                    datetime={item.date}
+                    aria-label={`更新日: ${item.date}`}
+                  >
+                    {new Date(item.date).toLocaleDateString("ja-JP")}
+                  </time>
+                ) : null}
+              </header>
 
-          <div class="text-sm text-neutral-700 dark:text-neutral-300">
-            <p class="whitespace-pre-wrap">{preview}</p>
-          </div>
-          </a>
-        </article>
-      )
-    })}
-
+              <div class="text-sm text-neutral-700 dark:text-neutral-300">
+                <p class="whitespace-pre-wrap">{preview}</p>
+              </div>
+            </a>
+          </article>
+        )
+      })
+    }
   </div>
 </>

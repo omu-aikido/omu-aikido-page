@@ -21,9 +21,13 @@ export default defineConfig({
     imageService: "passthrough",
   }),
 
-  site: import.meta.env.PROD
-    ? "https://omu-aikido.com"
-    : "http://localhost:4321",
+  output: "static",
+
+  prefetch: {
+    defaultStrategy: "hover",
+  },
+
+  trailingSlash: "ignore",
 
   vite: {
     plugins: [tailwindcss()],
