@@ -1,0 +1,22 @@
+---
+import Layout from "@/layouts/Layout.astro"
+import NewsList from "@/components/component/news.vue"
+---
+
+<Layout title="ニュースレター" description="最新情報をお知らせします">
+  <section class="my-8 px-6">
+    <div class="text-center">
+      <h1
+        class="mb-4 text-3xl font-bold text-neutral-900 dark:text-neutral-100"
+      >
+        お知らせ
+      </h1>
+      <p
+        class="mx-auto mb-6 max-w-2xl text-base text-neutral-700 dark:text-neutral-300"
+      >
+        合氣道部からのお知らせを掲載します。更新がある場合は随時追加されます。
+      </p>
+    </div>
+    <NewsList client:load/>
+  </section>
+</Layout>

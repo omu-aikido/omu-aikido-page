@@ -3,7 +3,7 @@ import { defineConfig } from "astro/config"
 
 import cloudflare from "@astrojs/cloudflare"
 
-import react from "@astrojs/react"
+import vue from "@astrojs/vue"
 import tailwindcss from "@tailwindcss/vite"
 
 import mdx from "@astrojs/mdx"
@@ -21,22 +21,28 @@ export default defineConfig({
     imageService: "passthrough",
   }),
 
-  site: import.meta.env.PROD
-    ? "https://omu-aikido.com"
-    : "http://localhost:4321",
+  site: "https://omu-aikido.com",
+
+  output: "static",
+
+  prefetch: {
+    defaultStrategy: "hover",
+  },
+
+  trailingSlash: "ignore",
 
   vite: {
     plugins: [tailwindcss()],
   },
 
   integrations: [
-    react(),
+    vue(),
     mdx(),
     sitemap(),
     astroLLMsGenerator({
       title: "大阪公立大学合氣道部",
       description:
-        "大阪公立大学で活動する体育会所属の合気道部である、大阪公立大学合氣道部のホームページです",
+        "大阪公立大学で活動する体育会所属の合気道団体である、大阪公立大学合氣道部のホームページです。\nなお、当団体は「大阪公立大学合氣道部」であり、「大阪公立大学体育会合気道部」とは別の団体です。",
     }),
   ],
 })

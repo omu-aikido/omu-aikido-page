@@ -13,7 +13,7 @@ const { frontmatter } = Astro.props
 const styles = tv({
   base: [
     "px-6 sm:px-8 mx-auto pb-6 bg-neutral-100 dark:bg-neutral-900/80 rounded-lg",
-    "md:min-w-0 pt-4 lg:pt-8",
+    "md:min-w-0 mt-4",
     "max-w-3xl md:max-w-2xl lg:max-w-none mx-auto",
     "w-full",
     "text-neutral-700 dark:text-neutral-300",
@@ -22,7 +22,7 @@ const styles = tv({
     "[&_h3]:text-lg [&_h3]:pt-3 [&_h3]:pb-1 [&_h3]:font-semibold",
     "[&_h4]:text-base [&_h4]:pt-2 [&_h4]:pb-1",
     "[&_p]:text-base [&_p]:pt-2 [&_p]:pb-1 [&_p]:px-2",
-    "[&_a]:text-emerald-700 [&_a]:dark:text-emerald-400 [&_a]:underline [&_a]:hover:text-blue-500 [&_a]:px-2",
+    "[&_a]:text-cyan-700 [&_a]:dark:text-cyan-400 [&_a]:underline [&_a]:hover:text-blue-500 [&_a]:px-2",
     "[&_ul]:list-disc [&_ul]:pl-4 [&_ul]:pb-2 [&_ul]:px-2",
     "[&_li]:pb-2, [&_li]:px-2",
     "[&_blockquote]:border-l-2 [&_blockquote]:border-neutral-300 [&_blockquote]:dark:border-neutral-600 [&_blockquote]:pl-4",
@@ -37,9 +37,9 @@ const articleLayoutClass = articleLayout()
 ---
 
 <Layout title={frontmatter.title} description={frontmatter.description ?? ""}>
-  <div class="mx-auto grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
+  <div class="mx-auto items-start max-w-5xl min-w-64">
     <h1
-      class={`${articleLayoutClass} text-2xl font-semibold px-5 text-neutral-700 dark:text-neutral-300`}
+      class={`${articleLayoutClass} text-3xl font-semibold px-5 text-neutral-700 dark:text-neutral-300`}
     >
       {frontmatter.title}
     </h1>

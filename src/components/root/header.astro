@@ -1,7 +1,70 @@
 ---
-import ReactHeader from "./header.tsx"
+import { Image } from "astro:assets"
+import Sidebar from "@/components/component/sidebar.vue"
 ---
 
-<header class="sticky top-0">
-  <ReactHeader client:load />
+<header class="sticky top-0 backdrop-blur-3xl">
+  <div
+    aria-label="Global"
+    class="mx-auto flex max-w-7xl items-center justify-between p-5 lg:px-8"
+  >
+    <div class="flex lg:flex-1">
+      <a href="/" class="-m-1.5 p-1.5">
+        <span class="sr-only">大阪公立大学合氣道部</span>
+        <Image
+          alt=""
+          src="/favicon.svg"
+          class="h-10 w-auto rounded-full"
+          width={40}
+          height={40}
+          loading="eager"
+        />
+      </a>
+    </div>
+
+    <div class="flex lg:hidden">
+      <button
+        id="mobile-menu-toggle"
+        type="button"
+        aria-controls="mobile-menu-root"
+        aria-expanded="false"
+        class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-neutral-700 hover:cursor-pointer dark:text-neutral-400"
+        onclick="window.dispatchEvent(new CustomEvent('sidebar:open'))"
+      >
+        <span class="sr-only">リンクメニューを開く</span>
+        <svg
+          class="h-6 w-6"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+    <nav
+      class="[&_a]:text-md hidden lg:flex lg:gap-x-12 [&_a]:rounded-md [&_a]:p-3 [&_a]:font-semibold [&_a]:text-neutral-900 [&_a]:hover:bg-neutral-500/20 [&_a]:dark:text-neutral-100"
+    >
+      <a href="/">ホーム</a>
+      <a href="/about">合氣道部について</a>
+      <a href="/calendar">稽古予定</a>
+      <a href="/access">アクセス</a>
+    </nav>
+
+    <nav class="hidden lg:flex lg:flex-1 lg:justify-end">
+      <a
+        href="/support"
+        class="rounded-md p-3 font-semibold text-neutral-900 hover:bg-neutral-500/20 dark:text-neutral-100"
+      >
+        応援する<span aria-hidden="true">&rarr;</span>
+      </a>
+    </nav>
+  </div>
+  <Sidebar client:idle />
 </header>

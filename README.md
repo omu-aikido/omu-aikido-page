@@ -1,43 +1,43 @@
 ## 概要
 
 - Framework: Astro
-- UI: Astro, React（@astrojs/react）
+- UI: Astro, Vue（@astrojs/vue）
 - Styling: Tailwind CSS
 - Deployment: Cloudflare Pages（wrangler）
 
 ## 前提
 
 - Node.js
-- pnpm
+- bun
 
 ## クイックスタート
 
 ```sh
 # リポジトリルートで実行
-pnpm install
-pnpm dev              # 開発サーバを起動（通常 http://localhost:4321）
+bun install
+bun dev              # 開発サーバを起動（通常 http://localhost:4321）
 ```
 
 ## package.json の主要スクリプト
 
 （プロジェクトの `package.json` を反映）
 
-- `pnpm dev`
+- `bun dev`
   `astro dev`：ローカル開発サーバを起動
 
-- `pnpm build`
+- `bun build`
   `astro build`：本番用にビルド（出力先は Astro の設定に準拠。通常は `dist` または `build`）
 
-- `pnpm preview`
+- `bun preview`
   `astro build && wrangler pages dev`：ビルド後に wrangler のローカル Pages エミュレーションを起動
 
-- `pnpm deploy`
+- `bun deploy`
   `astro build && wrangler pages deploy dist --project-name=omu-aikido-page --branch=preview`：ビルドして Cloudflare Pages にデプロイ（project-name / branch は package.json にハードコード）
 
-- `pnpm cf-typegen`
+- `bun cf-typegen`
   `wrangler types`：Wrangler 用の型生成（必要に応じて）
 
-- `pnpm format`
+- `bun format`
   `prettier --write .`：コード整形
 
 ## ディレクトリ構成
