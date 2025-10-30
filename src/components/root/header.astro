@@ -1,6 +1,6 @@
 ---
 import { Image } from "astro:assets"
-import { Sidebar } from "@/src/components/component/sidebar"
+import Sidebar from "@/components/component/sidebar.vue"
 ---
 
 <header class="sticky top-0 backdrop-blur-3xl">
@@ -66,5 +66,5 @@ import { Sidebar } from "@/src/components/component/sidebar"
       </a>
     </nav>
   </div>
-  <Sidebar client:load />
+  <Sidebar client:idle />
 </header>
