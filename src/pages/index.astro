@@ -3,7 +3,7 @@ import aikidoImage from "@/assets/84DABC3E-78F6-4FAC-B2EB-F98F5DDDFC15.webp"
 import NavCard from "@/components/ui/navcard.astro"
 import NewsFeed from "@/components/component/newsFeed.vue"
 import Layout from "@/layouts/Layout.astro"
-import { Image } from "astro:assets"
+import { Picture } from "astro:assets"
 ---
 
 <Layout title="トップ" description="大阪公立大学合氣道部の公式ホームページです">
@@ -79,10 +79,10 @@ import { Image } from "astro:assets"
           </a>
         </div>
         <div class="text-center">
-          <Image
+          <Picture
+            formats={["webp"]}
             src={aikidoImage}
             alt="座技呼吸法を指導する様子"
-            loading="lazy"
             class="mx-auto flex h-56 w-56 items-center justify-center rounded-full bg-neutral-200 dark:bg-neutral-600"
           />
         </div>

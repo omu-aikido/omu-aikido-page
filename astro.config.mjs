@@ -18,16 +18,12 @@ export default defineConfig({
       enabled: true,
     },
 
-    imageService: "passthrough",
+    imageService: "compile",
   }),
 
   site: "https://omu-aikido.com",
 
   output: "static",
-
-  prefetch: {
-    defaultStrategy: "hover",
-  },
 
   trailingSlash: "ignore",
 
