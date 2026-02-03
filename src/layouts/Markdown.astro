@@ -1,6 +1,5 @@
 ---
 import type { MarkdownLayoutProps } from "astro"
-import { tv } from "tailwind-variants"
 import Layout from "./Layout.astro"
 
 type Props = MarkdownLayoutProps<{
@@ -10,9 +9,7 @@ type Props = MarkdownLayoutProps<{
 
 const { frontmatter } = Astro.props
 
-const styles = tv({
-  base: [
-    "px-6 sm:px-8 mx-auto pb-6 bg-neutral-100 dark:bg-neutral-900/80 rounded-lg",
+const styles = () => ["px-6 sm:px-8 mx-auto pb-6 bg-neutral-100 dark:bg-neutral-900/80 rounded-lg",
     "md:min-w-0 mt-4",
     "max-w-3xl md:max-w-2xl lg:max-w-none mx-auto",
     "w-full",
@@ -27,13 +24,10 @@ const styles = tv({
     "[&_li]:pb-2, [&_li]:px-2",
     "[&_blockquote]:border-l-2 [&_blockquote]:border-neutral-300 [&_blockquote]:dark:border-neutral-600 [&_blockquote]:pl-4",
     "[&_img]:mb-4 [&_img]:px-2 [&_img]:sm:max-w-96 [&_img]:h-auto",
-  ],
-})
+    ].join(" ")
 
-const articleLayout = tv({
-  base: ["w-full", "lg:col-span-9"],
-})
-const articleLayoutClass = articleLayout()
+
+const articleLayoutClass = ["w-full", "lg:col-span-9"].join(" ")
 ---
 
 <Layout title={frontmatter.title} description={frontmatter.description ?? ""}>

@@ -1,10 +1,5 @@
 {
   "lsp": {
-    "tailwindcss-language-server": {
-      "settings": {
-        "classFunctions": ["cva", "cx"]
-      }
-    },
     "vscode-css-language-server": {
       "settings": {
         "css": {
