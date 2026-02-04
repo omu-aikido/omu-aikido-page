@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from "vue";
 
 type Event = {
   id: string;
@@ -14,7 +14,7 @@ interface CalendarViewProps {
 }
 
 const props = withDefaults(defineProps<CalendarViewProps>(), {
-  endpoint: "https://api.omu-aikido.com/calendar/json"
+  endpoint: "https://api.omu-aikido.com/calendar/json",
 });
 
 const events = ref<Event[]>([]);
@@ -31,19 +31,14 @@ async function fetchEvents() {
   try {
     const res = await fetch(props.endpoint, { signal: controller.signal });
     if (!res.ok) {
-      throw new Error(
-        `Failed to fetch events: ${res.status} ${res.statusText}`,
-      );
+      throw new Error(`Failed to fetch events: ${res.status} ${res.statusText}`);
     }
     const data = (await res.json()) as Event[];
     if (!cancelled) {
       events.value = Array.isArray(data) ? data : [];
     }
   } catch (err: unknown) {
-    if (
-      !cancelled &&
-      !(err instanceof Error && err.name === "AbortError")
-    ) {
+    if (!cancelled && !(err instanceof Error && err.name === "AbortError")) {
       if (err instanceof Error) {
         error.value = err.message;
       } else {
@@ -113,21 +108,20 @@ function getTitleClass(title: string) {
 <template>
   <!-- Loading State -->
   <div v-if="loading" class="py-12 text-center">
-    <div class="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-neutral-900 dark:border-neutral-100"></div>
-    <p class="text-lg text-neutral-600 dark:text-neutral-400">
-      Loading...
-    </p>
+    <div
+      class="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-neutral-900 dark:border-neutral-100"
+    ></div>
+    <p class="text-lg text-neutral-600 dark:text-neutral-400">Loading...</p>
   </div>
 
   <!-- Error State -->
-  <div v-if="error" class="mx-6 mb-6 rounded-lg border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-900/20">
+  <div
+    v-if="error"
+    class="mx-6 mb-6 rounded-lg border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-900/20"
+  >
     <div class="flex items-center">
       <div class="shrink-0">
-        <svg
-          class="h-5 w-5 text-red-400"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
+        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
           <path
             fill-rule="evenodd"
             d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -136,9 +130,7 @@ function getTitleClass(title: string) {
         </svg>
       </div>
       <div class="ml-3">
-        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
-          エラーが発生しました
-        </h3>
+        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">エラーが発生しました</h3>
         <p class="mt-1 text-sm text-red-700 dark:text-red-300">
           {{ error }}
         </p>
@@ -178,14 +170,11 @@ function getTitleClass(title: string) {
           <h3 :class="getTitleClass(event.title)">
             {{ event.title }}
           </h3>
-          <div class="text-md grid grid-cols-1 items-center text-neutral-500 sm:grid-cols-2 dark:text-neutral-400">
+          <div
+            class="text-md grid grid-cols-1 items-center text-neutral-500 sm:grid-cols-2 dark:text-neutral-400"
+          >
             <div class="flex items-center">
-              <svg
-                class="mr-2 h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -197,13 +186,11 @@ function getTitleClass(title: string) {
                 {{ formatDate(event.start) }}
               </span>
             </div>
-            <div v-if="!isAllDayEvent(event) && event.start !== event.end" class="flex items-center">
-              <svg
-                class="mr-2 h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+            <div
+              v-if="!isAllDayEvent(event) && event.start !== event.end"
+              class="flex items-center"
+            >
+              <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
