@@ -1,13 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from "vue";
-
-type Event = {
-  id: string;
-  start: string;
-  end: string;
-  title: string;
-  description?: string;
-};
+import type { Event } from "./types";
+import CalendarList from "./calendarList.vue";
+import CalendarGrid from "./calendarGrid.vue";
 
 interface CalendarViewProps {
   endpoint?: string;
@@ -20,6 +15,7 @@ const props = withDefaults(defineProps<CalendarViewProps>(), {
 const events = ref<Event[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
+const viewMode = ref<"list" | "calendar">("list");
 
 let cancelled = false;
 let controller: AbortController;
@@ -51,6 +47,18 @@ async function fetchEvents() {
   }
 }
 
+// Filter events for current month only
+const currentMonthEvents = computed(() => {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+
+  return events.value.filter((event) => {
+    const eventDate = new Date(event.start);
+    return eventDate.getFullYear() === currentYear && eventDate.getMonth() === currentMonth;
+  });
+});
+
 onMounted(() => {
   controller = new AbortController();
   fetchEvents();
@@ -62,50 +70,43 @@ onUnmounted(() => {
     controller.abort();
   }
 });
-
-function formatDate(dateString: string) {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) return dateString;
-
-  return date.toLocaleDateString("ja-JP", {
-    month: "short",
-    day: "numeric",
-    weekday: "short",
-  });
-}
-
-function formatTime(dateString: string) {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) return "";
-
-  return date.toLocaleTimeString("ja-JP", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-function isAllDayEvent(event: Event) {
-  const startDate = new Date(event.start);
-  const endDate = new Date(event.end);
-  return endDate.getTime() - startDate.getTime() === 24 * 60 * 60 * 1000;
-}
-
-function getTitleClass(title: string) {
-  if (title.includes("中百舌鳥")) {
-    return "mb-2 text-lg font-semibold text-cyan-600 dark:text-cyan-300";
-  } else if (title.includes("杉本")) {
-    return "mb-2 text-lg font-semibold text-green-700 dark:text-green-300";
-  } else if (title.includes("会")) {
-    return "mb-2 text-lg font-semibold text-orange-700 dark:text-orange-300";
-  } else {
-    return "mb-2 text-lg font-semibold text-neutral-900 dark:text-neutral-100";
-  }
-}
 </script>
 
 <template>
+  <!-- View Mode Toggle -->
+  <div v-if="!loading && !error" class="mb-6">
+    <div
+      class="flex items-center justify-end gap-2 rounded-lg bg-neutral-100 p-1 dark:bg-neutral-800"
+    >
+      <button
+        type="button"
+        @click="viewMode = 'list'"
+        :class="[
+          'flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all duration-200',
+          viewMode === 'list'
+            ? 'bg-white text-neutral-900 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-700 dark:text-neutral-100 dark:ring-neutral-600'
+            : 'text-neutral-600 hover:bg-white/50 dark:text-neutral-400 dark:hover:bg-neutral-700/50',
+        ]"
+      >
+        <div class="i-heroicons:list-bullet-16-solid" />
+        リスト
+      </button>
+      <button
+        type="button"
+        @click="viewMode = 'calendar'"
+        :class="[
+          'flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all duration-200',
+          viewMode === 'calendar'
+            ? 'bg-white text-neutral-900 shadow-sm ring-1 ring-neutral-200 dark:bg-neutral-700 dark:text-neutral-100 dark:ring-neutral-600'
+            : 'text-neutral-600 hover:bg-white/50 dark:text-neutral-400 dark:hover:bg-neutral-700/50',
+        ]"
+      >
+        <div class="i-heroicons:calendar-days-16-solid" />
+        カレンダー
+      </button>
+    </div>
+  </div>
+
   <!-- Loading State -->
   <div v-if="loading" class="py-12 text-center">
     <div
@@ -139,7 +140,7 @@ function getTitleClass(title: string) {
   </div>
 
   <!-- Empty State -->
-  <div v-if="!loading && !error && events.length === 0" class="py-12 text-center">
+  <div v-if="!loading && !error && currentMonthEvents.length === 0" class="py-12 text-center">
     <svg
       class="mx-auto mb-4 h-12 w-12 text-neutral-400"
       fill="none"
@@ -154,58 +155,19 @@ function getTitleClass(title: string) {
       />
     </svg>
     <p class="mb-2 text-lg text-neutral-600 dark:text-neutral-400">
-      現在予定されている稽古はありません
+      今月予定されている稽古はありません
     </p>
   </div>
 
-  <!-- Events List -->
-  <div v-if="!loading && !error && events.length > 0" class="mb-8 space-y-4">
-    <div
-      v-for="event in events"
-      :key="event.id"
-      class="rounded-lg border border-neutral-200 bg-white p-6 transition-shadow duration-200 hover:shadow-md dark:border-neutral-600 dark:bg-neutral-700"
-    >
-      <div class="flex items-start justify-between">
-        <div class="flex-1">
-          <h3 :class="getTitleClass(event.title)">
-            {{ event.title }}
-          </h3>
-          <div
-            class="text-md grid grid-cols-1 items-center text-neutral-500 sm:grid-cols-2 dark:text-neutral-400"
-          >
-            <div class="flex items-center">
-              <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  :stroke-width="2"
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-              <span class="mr-4 text-neutral-700 dark:text-neutral-300">
-                {{ formatDate(event.start) }}
-              </span>
-            </div>
-            <div
-              v-if="!isAllDayEvent(event) && event.start !== event.end"
-              class="flex items-center"
-            >
-              <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  :stroke-width="2"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span class="mr-4 text-neutral-700 dark:text-neutral-300">
-                {{ formatTime(event.start) }}
-                <span v-if="event.end"> - {{ formatTime(event.end) }}</span>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- Calendar Grid View -->
+  <CalendarGrid
+    v-if="!loading && !error && currentMonthEvents.length > 0 && viewMode === 'calendar'"
+    :events="currentMonthEvents"
+  />
+
+  <!-- Calendar List View -->
+  <CalendarList
+    v-if="!loading && !error && currentMonthEvents.length > 0 && viewMode === 'list'"
+    :events="currentMonthEvents"
+  />
 </template>

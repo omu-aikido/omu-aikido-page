@@ -17,20 +17,9 @@ import Layout from "@/layouts/Layout.astro"
 
     <div
       id="google-calendar-navigation"
-      class="mx-6 flex items-start rounded-lg border border-neutral-200 bg-neutral-50 p-6 dark:border-neutral-600 dark:bg-neutral-700/50"
+      class="flex-inline items-center mt-4"
     >
-      <svg
-        class="mt-0.5 mr-3 h-5 w-5 shrink-0 text-blue-500"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width={2}
-          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-      </svg>
+      <div class="i-heroicons:information-circle-20-solid w-8" />
       <p class="text-neutral-600 dark:text-neutral-300">
         <a
           href="https://calendar.google.com/calendar/embed?src=new.ocuaikido%40gmail.com"
@@ -38,9 +27,8 @@ import Layout from "@/layouts/Layout.astro"
           rel="noopener noreferrer"
           class="text-cyan-600 underline dark:text-cyan-400"
         >
-          Googleカレンダー</a
-        >では過去の稽古や１ヶ月以上先の稽古予定も確認できます。
-      </p>
+          Googleカレンダー</a>では過去の稽古や１ヶ月以上先の稽古予定も確認できます。
+        <span/>
     </div>
   </div>
 </Layout>
